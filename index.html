@@ -1,912 +1,855 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Football Position Explorer</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Football Explorer</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f5f5f3;--bg3:#eeecea;
+  --bg-info:#e6f1fb;--bg-success:#eaf3de;--bg-danger:#fcebeb;--bg-warn:#faeeda;
+  --text:#1a1a18;--text2:#6b6b67;--text3:#9e9b94;
+  --text-info:#185fa5;--text-success:#3b6d11;--text-danger:#a32d2d;--text-warn:#854f0b;
+  --border:rgba(0,0,0,.11);--border2:rgba(0,0,0,.22);
+  --bi:#378add;--bs:#639922;--bd:#e24b4a;--bw:#ef9f27;
+  --r:8px;--rl:12px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1c1c1a;--bg2:#262624;--bg3:#2e2e2b;
+  --bg-info:#0c447c;--bg-success:#27500a;--bg-danger:#791f1f;--bg-warn:#633806;
+  --text:#f0ede8;--text2:#9e9b94;--text3:#6b6b67;
+  --text-info:#85b7eb;--text-success:#97c459;--text-danger:#f09595;--text-warn:#fac775;
+  --border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.22);
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg2);color:var(--text);min-height:100vh;line-height:1.5}
+.page{max-width:960px;margin:0 auto;padding:1.5rem 1.25rem 4rem}
 
-  :root {
-    --bg: #ffffff;
-    --bg-secondary: #f5f5f3;
-    --bg-info: #e6f1fb;
-    --bg-success: #eaf3de;
-    --bg-danger: #fcebeb;
-    --text: #1a1a18;
-    --text-secondary: #6b6b67;
-    --text-info: #185fa5;
-    --text-success: #3b6d11;
-    --text-danger: #a32d2d;
-    --border: rgba(0,0,0,0.12);
-    --border-hover: rgba(0,0,0,0.25);
-    --border-info: #378add;
-    --border-success: #639922;
-    --border-danger: #e24b4a;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
-  }
+/* ── App header ── */
+.app-hd{margin-bottom:1.5rem}
+.app-title{font-size:21px;font-weight:600;display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.app-sub{font-size:13px;color:var(--text2)}
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1c1c1a;
-      --bg-secondary: #262624;
-      --bg-info: #0c447c;
-      --bg-success: #27500a;
-      --bg-danger: #791f1f;
-      --text: #f0ede8;
-      --text-secondary: #9e9b94;
-      --text-info: #85b7eb;
-      --text-success: #97c459;
-      --text-danger: #f09595;
-      --border: rgba(255,255,255,0.12);
-      --border-hover: rgba(255,255,255,0.28);
-      --border-info: #378add;
-      --border-success: #639922;
-      --border-danger: #e24b4a;
-    }
-  }
+/* ── Top nav ── */
+.top-nav{display:flex;gap:6px;margin-bottom:1.75rem;border-bottom:.5px solid var(--border);padding-bottom:.9rem}
+.tnav{padding:7px 18px;border-radius:999px;border:.5px solid var(--border);background:var(--bg);font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);font-family:inherit;transition:all .12s}
+.tnav:hover{border-color:var(--border2);color:var(--text)}
+.tnav.active{background:var(--bg-info);color:var(--text-info);border-color:var(--bi)}
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    background: var(--bg-secondary);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 2rem 1rem;
-  }
+/* ── Shared labels/crumbs ── */
+.lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text3);margin-bottom:8px}
+.crumb{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);margin-bottom:1.1rem;flex-wrap:wrap}
+.crumb button{background:none;border:none;cursor:pointer;color:var(--text-info);font:inherit;padding:0}
+.crumb button:hover{text-decoration:underline}
+.crumb-sep{color:var(--text3)}
 
-  .container {
-    max-width: 680px;
-    margin: 0 auto;
-  }
+/* ── Phase selector ── */
+.phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:440px}
+.phase-btn{padding:1.75rem 1.25rem;border-radius:var(--rl);border:.5px solid var(--border);background:var(--bg);cursor:pointer;text-align:center;color:var(--text);transition:all .13s}
+.phase-btn:hover{border-color:var(--border2);background:var(--bg3);transform:translateY(-1px)}
+.phase-icon{font-size:32px;display:block;margin-bottom:8px}
+.phase-label{font-size:16px;font-weight:600;display:block}
+.phase-sub{font-size:12px;color:var(--text2);margin-top:3px;display:block}
 
-  .app-title {
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
+/* ── Group tabs / pills ── */
+.group-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;border-bottom:.5px solid var(--border);padding-bottom:.7rem}
+.gtab{padding:5px 13px;border-radius:999px;border:.5px solid var(--border);background:var(--bg);font-size:13px;cursor:pointer;color:var(--text2);font-family:inherit;transition:all .1s}
+.gtab:hover{border-color:var(--border2);color:var(--text)}
+.gtab.active{background:var(--bg-info);color:var(--text-info);border-color:var(--bi)}
 
-  .app-sub {
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin-bottom: 2rem;
-  }
+/* ── Card grids ── */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.card{padding:13px;border-radius:var(--r);border:.5px solid var(--border);background:var(--bg);cursor:pointer;text-align:left;transition:all .12s}
+.card:hover{border-color:var(--border2);background:var(--bg3);transform:translateY(-1px)}
+.card-abbr{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.card-name{font-size:13px;font-weight:500}
+.card-sub{font-size:11px;color:var(--text2);margin-top:2px}
 
-  .section-label {
-    font-size: 11px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 10px;
-  }
+/* ── Detail layout ── */
+.det-top{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:620px){.det-top{grid-template-columns:1fr}}
 
-  /* Phase select */
-  .phase-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 1.5rem;
-  }
+/* ── Field panel ── */
+.field-panel{border:.5px solid var(--border);border-radius:var(--rl);background:var(--bg);overflow:hidden}
+.field-phead{padding:.6rem 1rem;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.field-ptitle{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text2)}
+.f-legend{display:flex;gap:9px;font-size:10px;color:var(--text3)}
+.fl{display:flex;align-items:center;gap:4px}
+.fld{width:8px;height:8px;border-radius:50%}
+.field-svg-wrap{padding:10px;background:var(--bg2)}
+.field-note{padding:.55rem 1rem;border-top:.5px solid var(--border);font-size:12px;color:var(--text2);line-height:1.5;min-height:38px}
 
-  .phase-btn {
-    padding: 1.5rem 1rem;
-    border-radius: var(--radius-lg);
-    border: 0.5px solid var(--border);
-    background: var(--bg);
-    cursor: pointer;
-    text-align: center;
-    transition: border-color 0.15s, background 0.15s;
-    color: var(--text);
-  }
-  .phase-btn:hover { border-color: var(--border-hover); background: var(--bg-secondary); }
-  .phase-icon { font-size: 28px; margin-bottom: 8px; }
-  .phase-label { font-size: 16px; font-weight: 500; }
-  .phase-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+/* ── Info panel ── */
+.info-panel{border:.5px solid var(--border);border-radius:var(--rl);background:var(--bg);overflow:hidden;display:flex;flex-direction:column}
+.pos-head{padding:1rem 1.2rem;border-bottom:.5px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.pos-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--bg-info);color:var(--text-info);white-space:nowrap;flex-shrink:0;letter-spacing:.04em}
+.pos-badge.def{background:var(--bg-danger);color:var(--text-danger)}
+.pos-badge.sch{background:var(--bg-warn);color:var(--text-warn)}
+.pos-title{font-size:17px;font-weight:600;line-height:1.2}
+.pos-tagline{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.5}
+.tasks-sec{padding:.9rem 1.2rem;flex:1}
+.task-list{list-style:none}
+.task-item{display:flex;align-items:flex-start;gap:9px;padding:5px 0;font-size:13px;border-bottom:.5px solid var(--border)}
+.task-item:last-child{border-bottom:none}
+.task-n{font-size:9px;font-weight:700;color:var(--text3);min-width:14px;padding-top:2px}
 
-  /* Group pills */
-  .group-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-  }
+/* ── Schemes detail cards ── */
+.scheme-detail{border:.5px solid var(--border);border-radius:var(--rl);background:var(--bg);overflow:hidden}
+.sch-section{padding:.9rem 1.2rem;border-bottom:.5px solid var(--border)}
+.sch-section:last-child{border-bottom:none}
+.sch-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:.5rem}
+@media(max-width:520px){.sch-row{grid-template-columns:1fr}}
+.sch-box{padding:.65rem .9rem;border-radius:var(--r);border:.5px solid var(--border);font-size:12px;line-height:1.5}
+.sch-box.good{background:var(--bg-success);border-color:var(--bs);color:var(--text-success)}
+.sch-box.bad{background:var(--bg-danger);border-color:var(--bd);color:var(--text-danger)}
+.sch-box.neutral{background:var(--bg-warn);border-color:var(--bw);color:var(--text-warn)}
+.sch-box-title{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.matchup-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:.5rem}
+.matchup-pill{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:500}
+.matchup-pill.good{background:var(--bg-success);color:var(--text-success)}
+.matchup-pill.bad{background:var(--bg-danger);color:var(--text-danger)}
+.pers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:.5rem}
+.pers-card{padding:.6rem .85rem;border-radius:var(--r);border:.5px solid var(--border);background:var(--bg2);font-size:12px}
+.pers-card-title{font-weight:600;margin-bottom:2px;font-size:13px}
 
-  .group-btn {
-    padding: 6px 14px;
-    border-radius: 999px;
-    border: 0.5px solid var(--border);
-    background: var(--bg);
-    font-size: 13px;
-    cursor: pointer;
-    color: var(--text);
-    transition: all 0.12s;
-  }
-  .group-btn:hover { border-color: var(--border-hover); background: var(--bg-secondary); }
-  .group-btn.active {
-    background: var(--bg-info);
-    color: var(--text-info);
-    border-color: var(--border-info);
-  }
+/* ── Quiz ── */
+.quiz-panel{border:.5px solid var(--border);border-radius:var(--rl);background:var(--bg);overflow:hidden}
+.quiz-head{padding:.65rem 1.2rem;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.quiz-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text2)}
+.quiz-score{font-size:12px;color:var(--text3)}
+.quiz-q{padding:.9rem 1.2rem;border-bottom:.5px solid var(--border)}
+.quiz-q:last-child{border-bottom:none}
+.quiz-qn{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:5px}
+.quiz-qt{font-size:14px;font-weight:500;margin-bottom:9px;line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:5px}
+.opt{padding:8px 11px;border:.5px solid var(--border);border-radius:var(--r);background:var(--bg);font-size:13px;cursor:pointer;text-align:left;color:var(--text);display:flex;gap:8px;align-items:flex-start;width:100%;font-family:inherit;line-height:1.4;transition:all .1s}
+.opt:hover:not(:disabled){border-color:var(--border2);background:var(--bg2)}
+.opt:disabled{cursor:default}
+.opt.correct{background:var(--bg-success);border-color:var(--bs);color:var(--text-success)}
+.opt.wrong{background:var(--bg-danger);border-color:var(--bd);color:var(--text-danger)}
+.opt.reveal{background:var(--bg-success);border-color:var(--bs);color:var(--text-success);opacity:.6}
+.opt-l{font-weight:700;flex-shrink:0;font-size:11px;padding-top:1px}
+.feedback{margin-top:7px;font-size:12px;color:var(--text2);line-height:1.5;padding:5px 9px;background:var(--bg2);border-radius:6px}
 
-  /* Position cards */
-  .pos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 8px;
-    margin-bottom: 1.5rem;
-  }
-
-  .pos-card {
-    padding: 14px 12px;
-    border-radius: var(--radius-md);
-    border: 0.5px solid var(--border);
-    background: var(--bg);
-    cursor: pointer;
-    transition: all 0.12s;
-    text-align: left;
-  }
-  .pos-card:hover { border-color: var(--border-hover); background: var(--bg-secondary); }
-  .pos-abbr { font-size: 11px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.05em; }
-  .pos-name { font-size: 14px; font-weight: 500; color: var(--text); margin-top: 4px; }
-
-  /* Detail panel */
-  .detail-panel {
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-lg);
-    background: var(--bg);
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-  }
-
-  .detail-header {
-    padding: 1rem 1.25rem;
-    border-bottom: 0.5px solid var(--border);
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  .detail-abbr-badge {
-    font-size: 11px;
-    font-weight: 500;
-    padding: 3px 10px;
-    border-radius: 999px;
-    background: var(--bg-info);
-    color: var(--text-info);
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .detail-title { font-size: 18px; font-weight: 500; color: var(--text); }
-  .detail-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
-
-  .detail-tasks {
-    padding: 1rem 1.25rem;
-    border-bottom: 0.5px solid var(--border);
-  }
-
-  .task-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 8px;
-    font-size: 13px;
-    color: var(--text);
-  }
-  .task-row:last-child { margin-bottom: 0; }
-  .task-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--text-secondary);
-    margin-top: 5px;
-    flex-shrink: 0;
-  }
-
-  /* Quiz */
-  .quiz-section { padding: 1.25rem; }
-
-  .quiz-header {
-    font-size: 11px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 1rem;
-  }
-
-  .quiz-q {
-    margin-bottom: 1.25rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 0.5px solid var(--border);
-  }
-  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-
-  .quiz-q-text { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 10px; line-height: 1.5; }
-
-  .quiz-options { display: flex; flex-direction: column; gap: 6px; }
-
-  .quiz-opt {
-    padding: 9px 12px;
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-md);
-    background: var(--bg);
-    font-size: 13px;
-    cursor: pointer;
-    text-align: left;
-    color: var(--text);
-    transition: all 0.12s;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    width: 100%;
-    font-family: inherit;
-  }
-  .quiz-opt:hover:not(:disabled) { border-color: var(--border-hover); background: var(--bg-secondary); }
-  .quiz-opt:disabled { cursor: default; }
-  .quiz-opt.correct { background: var(--bg-success); border-color: var(--border-success); color: var(--text-success); }
-  .quiz-opt.wrong { background: var(--bg-danger); border-color: var(--border-danger); color: var(--text-danger); }
-  .quiz-opt.reveal { background: var(--bg-success); border-color: var(--border-success); color: var(--text-success); }
-
-  .opt-letter { font-weight: 500; flex-shrink: 0; }
-
-  .feedback { font-size: 12px; margin-top: 8px; color: var(--text-secondary); line-height: 1.5; }
-
-  /* Back button */
-  .back-btn {
-    font-size: 13px;
-    color: var(--text-secondary);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    margin-bottom: 1rem;
-    font-family: inherit;
-  }
-  .back-btn:hover { color: var(--text); }
-
-  /* Footer */
-  .footer {
-    text-align: center;
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 0.5px solid var(--border);
-  }
+/* ── Pos nav ── */
+.pos-nav{display:flex;align-items:center;justify-content:space-between;margin-top:1.25rem;padding-top:.9rem;border-top:.5px solid var(--border)}
+.nav-btn{padding:6px 14px;border-radius:var(--r);border:.5px solid var(--border);background:var(--bg);font-size:13px;cursor:pointer;color:var(--text2);font-family:inherit;transition:all .12s}
+.nav-btn:hover:not(:disabled){border-color:var(--border2);color:var(--text)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+.nav-mid{font-size:12px;color:var(--text3)}
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="app-title">🏈 Football Position Explorer</div>
-  <div class="app-sub">Lerne alle Positionen im American Football – Erklärungen &amp; Quiz</div>
-  <div id="root"></div>
-  <div class="footer">American Football Lernhilfe &mdash; Alle Positionen mit Quiz</div>
+<div class="page">
+  <div class="app-hd">
+    <div class="app-title">🏈 Football Explorer</div>
+    <div class="app-sub">Positionen, Formations, Personnel &amp; Defensive Schemes</div>
+  </div>
+
+  <div class="top-nav">
+    <button class="tnav active" id="tnav-pos" onclick="setTab('pos')">Positionen</button>
+    <button class="tnav" id="tnav-sch" onclick="setTab('sch')">Schemes &amp; Formations</button>
+  </div>
+
+  <!-- ══════════════════ TAB: POSITIONEN ══════════════════ -->
+  <div id="tab-pos">
+    <div id="sp-phase">
+      <div class="lbl">Wähle eine Phase</div>
+      <div class="phase-grid">
+        <button class="phase-btn" onclick="selPhase('offense')"><span class="phase-icon">🏈</span><span class="phase-label">Offense</span><span class="phase-sub">Ball in der Hand</span></button>
+        <button class="phase-btn" onclick="selPhase('defense')"><span class="phase-icon">🛡️</span><span class="phase-label">Defense</span><span class="phase-sub">Ball stoppen</span></button>
+      </div>
+    </div>
+    <div id="sp-browse" style="display:none">
+      <div class="crumb"><button onclick="goPhase()">Start</button><span class="crumb-sep">›</span><span id="bc-ph"></span></div>
+      <div class="lbl">Gruppe</div>
+      <div class="group-tabs" id="pos-group-tabs"></div>
+      <div class="lbl" style="margin-top:.5rem">Position wählen</div>
+      <div class="card-grid" id="pos-grid"></div>
+    </div>
+    <div id="sp-detail" style="display:none">
+      <div class="crumb">
+        <button onclick="goPhase()">Start</button><span class="crumb-sep">›</span>
+        <button onclick="goBrowse()" id="bc-ph2"></button><span class="crumb-sep">›</span>
+        <span id="bc-grp"></span><span class="crumb-sep">›</span><span id="bc-pos"></span>
+      </div>
+      <div class="det-top">
+        <div class="field-panel">
+          <div class="field-phead">
+            <span class="field-ptitle">Felddiagramm</span>
+            <div class="f-legend">
+              <div class="fl"><div class="fld" id="leg-sel" style="background:#378ADD"></div>Gewählt</div>
+              <div class="fl"><div class="fld" style="background:#888;opacity:.55"></div>Mitspieler</div>
+              <div class="fl"><div class="fld" style="background:#D85A30;opacity:.5"></div>Gegner</div>
+            </div>
+          </div>
+          <div class="field-svg-wrap"><svg width="100%" viewBox="0 0 380 255" id="pos-field-svg" style="display:block"></svg></div>
+          <div class="field-note" id="pos-field-note"></div>
+        </div>
+        <div class="info-panel">
+          <div class="pos-head">
+            <div><div class="pos-title" id="pos-title"></div><div class="pos-tagline" id="pos-tagline"></div></div>
+            <div class="pos-badge" id="pos-badge"></div>
+          </div>
+          <div class="tasks-sec">
+            <div class="lbl">Hauptaufgaben</div>
+            <ul class="task-list" id="task-list"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="quiz-panel">
+        <div class="quiz-head"><span class="quiz-title">Quiz</span><span class="quiz-score" id="pos-quiz-score"></span></div>
+        <div id="pos-quiz-body"></div>
+      </div>
+      <div class="pos-nav">
+        <button class="nav-btn" id="btn-prev" onclick="navPos(-1)">← Zurück</button>
+        <span class="nav-mid" id="nav-info"></span>
+        <button class="nav-btn" id="btn-next" onclick="navPos(1)">Weiter →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ TAB: SCHEMES ══════════════════ -->
+  <div id="tab-sch" style="display:none">
+    <div id="ss-phase">
+      <div class="lbl">Wähle eine Phase</div>
+      <div class="phase-grid">
+        <button class="phase-btn" onclick="selSchPhase('offense')"><span class="phase-icon">🏈</span><span class="phase-label">Offense</span><span class="phase-sub">Personnel &amp; Formations</span></button>
+        <button class="phase-btn" onclick="selSchPhase('defense')"><span class="phase-icon">🛡️</span><span class="phase-label">Defense</span><span class="phase-sub">Fronts &amp; Coverages</span></button>
+      </div>
+    </div>
+    <div id="ss-browse" style="display:none">
+      <div class="crumb"><button onclick="goSchPhase()">Start</button><span class="crumb-sep">›</span><span id="sbc-ph"></span></div>
+      <div class="lbl">Kategorie</div>
+      <div class="group-tabs" id="sch-group-tabs"></div>
+      <div class="lbl" style="margin-top:.5rem">Schema wählen</div>
+      <div class="card-grid" id="sch-grid"></div>
+    </div>
+    <div id="ss-detail" style="display:none">
+      <div class="crumb">
+        <button onclick="goSchPhase()">Start</button><span class="crumb-sep">›</span>
+        <button onclick="goSchBrowse()" id="sbc-ph2"></button><span class="crumb-sep">›</span>
+        <span id="sbc-grp"></span><span class="crumb-sep">›</span><span id="sbc-name"></span>
+      </div>
+      <div class="det-top">
+        <div class="field-panel">
+          <div class="field-phead"><span class="field-ptitle">Formation / Schema</span></div>
+          <div class="field-svg-wrap"><svg width="100%" viewBox="0 0 380 255" id="sch-field-svg" style="display:block"></svg></div>
+          <div class="field-note" id="sch-field-note"></div>
+        </div>
+        <div class="info-panel">
+          <div class="pos-head">
+            <div><div class="pos-title" id="sch-title"></div><div class="pos-tagline" id="sch-tagline"></div></div>
+            <div class="pos-badge sch" id="sch-badge"></div>
+          </div>
+          <div class="tasks-sec">
+            <div class="lbl">Kernprinzipien</div>
+            <ul class="task-list" id="sch-task-list"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="scheme-detail" id="sch-detail-cards"></div>
+      <div class="quiz-panel" style="margin-top:14px">
+        <div class="quiz-head"><span class="quiz-title">Quiz</span><span class="quiz-score" id="sch-quiz-score"></span></div>
+        <div id="sch-quiz-body"></div>
+      </div>
+      <div class="pos-nav">
+        <button class="nav-btn" id="sbtn-prev" onclick="navSch(-1)">← Zurück</button>
+        <span class="nav-mid" id="snav-info"></span>
+        <button class="nav-btn" id="sbtn-next" onclick="navSch(1)">Weiter →</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-const DATA = {
-  offense: {
-    label: "Offense",
-    icon: "🏈",
-    sub: "Ball in der Hand",
-    groups: {
-      "O-Line": {
-        label: "Offensive Line",
-        positions: {
-          C: {
-            name: "Center",
-            tagline: "Taktgeber der O-Line – snappt den Ball und koordiniert den gesamten Block.",
-            tasks: [
-              "Snappt den Ball zum Quarterback zu Beginn jedes Plays",
-              "Ruft Blocking-Anpassungen basierend auf der Defense",
-              "Schützt den A-Gap gegen Interior-Pass-Rusher",
-              "Kommuniziert Schutzregeln an Guards und Tackles"
-            ],
-            quiz: [
-              {
-                q: "Was ist die grundlegendste Aufgabe des Centers beim Start eines Plays?",
-                opts: ["Er läuft eine Route", "Er snappt den Ball zum Quarterback", "Er blockt den besten Pass Rusher"],
-                correct: 1,
-                tip: "Ohne den Snap kann kein Play beginnen – das ist die einzigartige Aufgabe des Centers."
-              },
-              {
-                q: "Welche zusätzliche Aufgabe hat der Center vor dem Snap?",
-                opts: ["Er entscheidet, welcher WR den Ball bekommt", "Er ruft Blocking-Anpassungen gegen die Defense", "Er blockt den Defensive End alleine"],
-                correct: 1,
-                tip: "Der Center liest die Defense und kommuniziert Schutzregeln an seine Mitspieler."
-              },
-              {
-                q: "Für welchen Bereich der Linie ist der Center hauptsächlich zuständig?",
-                opts: ["Außen links (Edge)", "Interior-Druck und A-Gap", "Deep Coverage"],
-                correct: 1,
-                tip: "Die A-Gaps links und rechts vom Center sind sein primäres Verantwortungsgebiet."
-              }
-            ]
-          },
-          G: {
-            name: "Guard",
-            tagline: "Flankenschutz des Centers – schützt die B-Gaps und öffnet Löcher im Run Game.",
-            tasks: [
-              "Schützt die B-Gaps neben dem Center",
-              "Zieht auf Pull-Blocks beim Run Game",
-              "Doppelteams mit Center oder Tackle",
-              "Blockiert Linebackers bei Zone-Runs"
-            ],
-            quiz: [
-              {
-                q: "Welchen Bereich schützt der Guard primär?",
-                opts: ["A-Gap (direkt neben dem Center)", "B-Gap (zwischen Center und Tackle)", "Edge außen"],
-                correct: 1,
-                tip: "Der B-Gap ist der Bereich direkt neben dem Guard – sein Hauptverantwortungsgebiet."
-              },
-              {
-                q: "Was ist ein 'Pull Block' beim Guard?",
-                opts: ["Ein Block nach hinten zum Quarterback", "Der Guard zieht seitlich und führt den Ballträger um die Ecke", "Ein Doppelteam mit dem Tight End"],
-                correct: 1,
-                tip: "Pull Blocks sind ein wichtiges Element vieler Laufspiele – der Guard fungiert als Lead Blocker."
-              }
-            ]
-          },
-          T: {
-            name: "Tackle",
-            tagline: "Der Eckpfeiler der O-Line – schützt den QB außen gegen Edge Rusher.",
-            tasks: [
-              "Schützt die C-Gaps und Edge außen",
-              "Verhindert, dass Speed Rusher den QB sacken",
-              "Der Left Tackle schützt die blinde Seite des QB",
-              "Engagiert sich in Run Blocks auf der Außenlinie"
-            ],
-            quiz: [
-              {
-                q: "Warum ist der Left Tackle oft der wertvollste O-Lineman?",
-                opts: ["Er snappt den Ball", "Er schützt die blinde Seite eines rechtshändigen QBs", "Er zieht die meisten Pässe"],
-                correct: 1,
-                tip: "Rechtshändige QBs schauen nach rechts – links ist ihre blinde Seite. Der LT schützt sie vor dem Sack."
-              },
-              {
-                q: "Gegen wen kämpft der Tackle meist?",
-                opts: ["Den freien Safety", "Edge Rusher und Speed Pass Rusher", "Den Cornerback"],
-                correct: 1,
-                tip: "Edge Rusher sind die explosivsten Verteidiger – der Tackle muss ihre Schnelligkeit kontern."
-              }
-            ]
-          }
-        }
-      },
-      "Backfield": {
-        label: "Backfield",
-        positions: {
-          QB: {
-            name: "Quarterback",
-            tagline: "Dirigent der Offense – liest die Defense, verteilt den Ball und führt das Team.",
-            tasks: [
-              "Nimmt den Snap und entscheidet: Pass, Run oder Option",
-              "Liest die Defense vor und nach dem Snap (Pre-Snap Read)",
-              "Wirft präzise Pässe in Fenster unter Druck",
-              "Kann selbst laufen (Scramble oder designed Run)"
-            ],
-            quiz: [
-              {
-                q: "Was bedeutet 'Pre-Snap Read' für den QB?",
-                opts: ["Er wirft vor dem Snap", "Er analysiert die Defense-Aufstellung bevor das Play beginnt", "Er liest den Spielplan neu"],
-                correct: 1,
-                tip: "Vor dem Snap erkennt der QB Coverages, Blitzes und offene Receiver – eine der wichtigsten Skills."
-              },
-              {
-                q: "Was ist eine 'Progressionslese'?",
-                opts: ["Der QB gibt den Ball weiter bevor er ihn hat", "Der QB schaut Receiver der Reihe nach durch bis einer frei ist", "Der QB rückt die Linie vor"],
-                correct: 1,
-                tip: "QBs haben 1st, 2nd, 3rd Read – sie arbeiten sich durch die Receiver bis einer offen ist."
-              },
-              {
-                q: "Was ist ein 'Scramble'?",
-                opts: ["Eine spezielle Passform", "Der QB läuft selbst, wenn kein Receiver frei ist", "Ein Block-Auftrag"],
-                correct: 1,
-                tip: "Wenn alle Receiver gedeckt sind, nutzt der QB seine eigene Schnelligkeit."
-              }
-            ]
-          },
-          RB: {
-            name: "Running Back",
-            tagline: "Motor des Run Games – trägt den Ball, fängt Pässe und blockt für den QB.",
-            tasks: [
-              "Nimmt Handoffs vom QB und läuft durch die Lücken",
-              "Liest Lücken schnell (Gap Reading)",
-              "Blockt Pass Rusher zum Schutz des QB",
-              "Fängt Checkdown-Pässe aus dem Backfield"
-            ],
-            quiz: [
-              {
-                q: "Was ist 'Gap Reading' beim Running Back?",
-                opts: ["Er liest den Spielplan", "Er erkennt und wählt die beste Lücke in der Defense im Laufen", "Er liest die Augen des QBs"],
-                correct: 1,
-                tip: "Gute RBs sehen Lücken entstehen und reagieren blitzschnell – das unterscheidet Elite-RBs."
-              },
-              {
-                q: "Was ist ein 'Checkdown' Pass?",
-                opts: ["Ein langer Touchdown Pass", "Ein kurzer Pass zum RB als letzte Option des QBs", "Ein Block-Befehl"],
-                correct: 1,
-                tip: "Wenn alle Primärreceiver gedeckt sind, ist der RB oft die sichere, kurze Option."
-              }
-            ]
-          },
-          FB: {
-            name: "Fullback",
-            tagline: "Lead Blocker und kurzer Runner – öffnet Wege für den Running Back.",
-            tasks: [
-              "Führt den Running Back als Lead Blocker",
-              "Trägt den Ball bei kurzen Yardage-Situationen",
-              "Blockt Linebackers im Second Level",
-              "Fängt gelegentlich Pässe im Kurzbereich"
-            ],
-            quiz: [
-              {
-                q: "Was ist die Hauptaufgabe des Fullbacks im modernen Football?",
-                opts: ["Lange Pässe fangen", "Als Lead Blocker dem Running Back den Weg freimachen", "Den QB schützen wie ein Lineman"],
-                correct: 1,
-                tip: "Der FB trifft den Linebacker, damit der RB einen freien Weg hat – echte Teamarbeit."
-              }
-            ]
-          }
-        }
-      },
-      "Receivers": {
-        label: "Receivers",
-        positions: {
-          WR: {
-            name: "Wide Receiver",
-            tagline: "Schnellster Spieler auf dem Feld – läuft präzise Routen und fängt Pässe.",
-            tasks: [
-              "Läuft präzise Routen (Routes) und schüttelt Cornerbacks ab",
-              "Fängt Pässe in Bewegung unter Druck",
-              "Blockt auf Run Plays (Crack Blocks, Stalk Blocks)",
-              "Erzwingt Einzel-Coverage durch Schnelligkeit"
-            ],
-            quiz: [
-              {
-                q: "Was ist eine 'Route' im Football?",
-                opts: ["Der Laufweg des Running Backs", "Der vorher festgelegte Laufweg des Receivers vor dem Pass", "Ein Blocking-Schema"],
-                correct: 1,
-                tip: "Routen sind präzise choreografiert – jede Millisekunde zählt für die Timing-Abstimmung mit dem QB."
-              },
-              {
-                q: "Was ist ein 'Release' beim Wide Receiver?",
-                opts: ["Den Ball freigeben", "Die Art, wie er sich vom Cornerback am Scrimmage-Punkt löst", "Ein Block-Auftrag"],
-                correct: 1,
-                tip: "Der Release entscheidet, ob der WR überhaupt an seinem Blocker vorbeikommt und die Route laufen kann."
-              },
-              {
-                q: "Was bedeutet 'Separation' beim Receiver?",
-                opts: ["Er trennt sich vom Team", "Er schafft Abstand zum deckenden Cornerback", "Er läuft in die entgegengesetzte Richtung"],
-                correct: 1,
-                tip: "Separation = freier Receiver. Ohne Separation hat der QB kein sicheres Anspielziel."
-              }
-            ]
-          },
-          TE: {
-            name: "Tight End",
-            tagline: "Hybrid-Spieler – blockt wie ein Lineman, fängt wie ein Receiver.",
-            tasks: [
-              "Blockt an der O-Line als 6. oder 7. Lineman",
-              "Läuft Routen im Kurzbereich (5–15 Yards)",
-              "Bietet dem QB sichere Anspielstation in der Mitte",
-              "Kann als H-Back im Backfield eingesetzt werden"
-            ],
-            quiz: [
-              {
-                q: "Was macht den Tight End zum 'Hybrid-Spieler'?",
-                opts: ["Er spielt zwei Positionen gleichzeitig", "Er kann sowohl blocken als auch als Receiver fungieren", "Er wechselt zwischen Offense und Defense"],
-                correct: 1,
-                tip: "Diese Vielseitigkeit macht TEs zu Matchup-Problemen – zu groß für Cornerbacks, zu schnell für Linebackers."
-              },
-              {
-                q: "In welcher Zone fängt der TE typischerweise Pässe?",
-                opts: ["Deep (über 30 Yards)", "Kurzbereich 5–15 Yards in der Mitte", "Nur an der Seitenlinie"],
-                correct: 1,
-                tip: "Der TE ist der 'safety valve' des QBs – zuverlässig, sicher und schwer zu decken in der Mitte."
-              }
-            ]
-          }
-        }
-      }
-    }
-  },
-  defense: {
-    label: "Defense",
-    icon: "🛡️",
-    sub: "Ball stoppen",
-    groups: {
-      "D-Line": {
-        label: "Defensive Line",
-        positions: {
-          DT: {
-            name: "Defensive Tackle",
-            tagline: "Interior-Kraft – stört Runs und presst den QB von innen.",
-            tasks: [
-              "Penetriert die Interior-Linie und blockiert Run Lanes",
-              "Erzeugt Interior Pass Rush durch den A- und B-Gap",
-              "Bindet Doppelteam-Blocker und macht LBs frei",
-              "Als Nose Tackle: den Center 1-on-1 schlagen"
-            ],
-            quiz: [
-              {
-                q: "Welche Gaps attackiert der Defensive Tackle primär?",
-                opts: ["Edge und C-Gap", "A-Gap und B-Gap (innen)", "Nur außen entlang der Linie"],
-                correct: 1,
-                tip: "Interior Rusher wie DTs arbeiten durch die Mitte – daher 'Interior' Pass Rush."
-              },
-              {
-                q: "Was macht ein 'Nose Tackle' besonders?",
-                opts: ["Er ist der schnellste Verteidiger", "Er aligned direkt gegenüber dem Center und kämpft 1-on-1", "Er ist für die Coverage zuständig"],
-                correct: 1,
-                tip: "Der Nose Tackle in einem 3-4-System ist oft der physischste Spieler auf dem Feld."
-              }
-            ]
-          },
-          DE: {
-            name: "Defensive End",
-            tagline: "Außenrandwächter – setzt den QB unter Druck und stoppt Outside Runs.",
-            tasks: [
-              "Rusht den QB von der Außenseite der Linie",
-              "Enthält Outside Runs (Run Containment)",
-              "Setzt Speed-Moves ein (Spin, Bull Rush, Swim)",
-              "Kann als 4-3 DE oder 3-4 OLB eingesetzt werden"
-            ],
-            quiz: [
-              {
-                q: "Was ist 'Run Containment' beim Defensive End?",
-                opts: ["Er fängt den Ball", "Er verhindert, dass der Runner außen herum gelangt", "Er deckt einen Receiver"],
-                correct: 1,
-                tip: "Der DE muss 'gap discipline' behalten – wenn er zu weit reinläuft, läuft der RB außen vorbei."
-              },
-              {
-                q: "Was ist ein 'Speed Move' beim Pass Rush?",
-                opts: ["Ein schneller Rückwärtslauf", "Eine Technik, um den Tackle mit Schnelligkeit zu umgehen", "Ein Cover-Auftrag"],
-                correct: 1,
-                tip: "Speed Moves wie der 'Spin Move' oder 'Swim Move' nutzen Schnelligkeit statt pure Kraft."
-              }
-            ]
-          }
-        }
-      },
-      "Linebackers": {
-        label: "Linebackers",
-        positions: {
-          MLB: {
-            name: "Middle Linebacker",
-            tagline: "Das Herz der Defense – Tackler, Leser und Anführer in der Mitte.",
-            tasks: [
-              "Liest Offense-Formationen und ruft Defense-Anpassungen",
-              "Tackelt Runner, die die Linie durchbrechen",
-              "Deckt Tight Ends oder Backs in Zone Coverage",
-              "Blitzt durch die A-Gaps bei Blitz-Schemes"
-            ],
-            quiz: [
-              {
-                q: "Warum gilt der Middle Linebacker als 'Quarterback der Defense'?",
-                opts: ["Er wirft gelegentlich", "Er liest die Offense und ruft Coverage-Anpassungen", "Er ist der schnellste Verteidiger"],
-                correct: 1,
-                tip: "Wie der QB auf Offense ist der MLB auf Defense für Kommunikation und Anpassungen zuständig."
-              },
-              {
-                q: "In welchem Bereich des Felds ist der MLB am aktivsten?",
-                opts: ["Ganz außen an den Sidelines", "Direkt hinter der D-Line in der Mitte", "In der Deep Zone hinter den Safeties"],
-                correct: 1,
-                tip: "Der MLB patrouilliert die Mitte – er ist die zweite Verteidigungslinie nach der D-Line."
-              }
-            ]
-          },
-          OLB: {
-            name: "Outside Linebacker",
-            tagline: "Flexibler Randbewacher – rusht, deckt oder tackelt je nach System.",
-            tasks: [
-              "In 4-3: deckt Coverage an der Außenlinie und tackelt",
-              "In 3-4: als Edge Rusher agiert wie ein DE",
-              "Deckt Flats, Curls und Screens an den Seiten",
-              "Enthält Outside Runs vom Rand"
-            ],
-            quiz: [
-              {
-                q: "Wie unterscheidet sich der OLB in einem 3-4 vs. 4-3 System?",
-                opts: ["Kein Unterschied", "Im 3-4 rusht er oft wie ein DE, im 4-3 ist er mehr Coverage-orientiert", "Im 4-3 spielt er Safety"],
-                correct: 1,
-                tip: "Die besten 3-4 OLBs (Edge Rusher) setzen den QB ständig unter Druck."
-              }
-            ]
-          },
-          ILB: {
-            name: "Inside Linebacker",
-            tagline: "Allrounder im Zentrum – stark im Run Stop und solide in Coverage.",
-            tasks: [
-              "Stoppt Runs durch die Mitte der Linie",
-              "Deckt Backs und TEs in Zone Coverage",
-              "Kommuniziert Coverage-Rotationen",
-              "Kämpft sich durch Blocks ins Backfield"
-            ],
-            quiz: [
-              {
-                q: "Was unterscheidet den ILB vom MLB im 4-3?",
-                opts: ["Nichts – sie sind identisch", "Im 3-4 gibt es zwei ILBs, die zusammen das Zentrum abdecken", "Der ILB spielt auf der Außenseite"],
-                correct: 1,
-                tip: "Das 3-4-System hat zwei Inside Linebackers – sie teilen sich die Verantwortung des MLBs im 4-3."
-              }
-            ]
-          }
-        }
-      },
-      "Secondary": {
-        label: "Secondary (Defensive Backs)",
-        positions: {
-          CB: {
-            name: "Cornerback",
-            tagline: "Eins-gegen-Eins-Spezialist – schattiert Wide Receiver und verhindert Pässe.",
-            tasks: [
-              "Deckt Wide Receiver in Man Coverage Eins-gegen-Eins",
-              "Spielt Zone Coverage und patrouilliert assigned Bereiche",
-              "Bricht auf kurze Pässe (Jams at line, Press Coverage)",
-              "Tackelt bei Run Plays nahe der Sidelines"
-            ],
-            quiz: [
-              {
-                q: "Was ist 'Press Coverage' beim Cornerback?",
-                opts: ["Er rückt auf die Linie vor und blockt", "Er positioniert sich direkt gegenüber dem WR und stört seinen Release", "Er blitzt durch die Linie"],
-                correct: 1,
-                tip: "Press Coverage unterbricht das Timing des Receivers und QBs – riskant, aber sehr effektiv."
-              },
-              {
-                q: "Was ist eine 'Interception'?",
-                opts: ["Ein Tackle hinter der Linie", "Der CB fängt einen für den Receiver bestimmten Pass", "Ein Holding-Foul"],
-                correct: 1,
-                tip: "Interceptions sind Turnover – sofortiger Ballbesitzwechsel, oft spielentscheidend."
-              },
-              {
-                q: "Was ist der Unterschied zwischen Man Coverage und Zone Coverage?",
-                opts: ["Kein Unterschied", "Man = ein Verteidiger deckt einen Receiver, Zone = Verteidiger deckt einen Bereich", "Zone ist nur für Safeties"],
-                correct: 1,
-                tip: "In Man Coverage folgt der CB dem WR überall – in Zone bleibt er in seinem Bereich."
-              }
-            ]
-          },
-          FS: {
-            name: "Free Safety",
-            tagline: "Letzte Verteidigungslinie – überwacht die tiefe Feldmitte und räumt auf.",
-            tasks: [
-              "Überwacht die tiefe Feldmitte gegen lange Pässe",
-              "Liest den QB und reagiert auf Routen",
-              "Hilft Cornerbacks in Cover-2 und Cover-3",
-              "Interceptiert schlecht platzierte Pässe"
-            ],
-            quiz: [
-              {
-                q: "Warum heißt der Free Safety 'free'?",
-                opts: ["Er ist nicht im Kader bezahlt", "Er ist ohne festen Deckungsauftrag und kann frei reagieren", "Er darf das Feld verlassen"],
-                correct: 1,
-                tip: "Ohne festen Man-Coverage-Auftrag kann der FS überall dort helfen, wo er gebraucht wird."
-              },
-              {
-                q: "Was ist der Free Safety in einem Cover-3 System?",
-                opts: ["Er rusht den QB", "Er deckt die mittlere Deep Zone alleine", "Er blitzt immer"],
-                correct: 1,
-                tip: "In Cover-3 teilen drei Verteidiger das Deep Field auf – der FS übernimmt die Mitte."
-              }
-            ]
-          },
-          SS: {
-            name: "Strong Safety",
-            tagline: "Hybrid-Verteidiger – physisch wie ein LB, aber mit Safety-Reichweite.",
-            tasks: [
-              "Positioniert näher an der Linie gegen Run Plays",
-              "Deckt Tight Ends und größere Receivers",
-              "Kann als Linebacker-Ersatz blitzen",
-              "Unterstützt in Cover-2 auf seiner Seite"
-            ],
-            quiz: [
-              {
-                q: "Warum steht der Strong Safety näher an der Linie als der Free Safety?",
-                opts: ["Er ist langsamer", "Er ist für den Tight End und Run Support zuständig", "Er deckt die Mitte des Feldes"],
-                correct: 1,
-                tip: "Der SS wird auf der 'starken Seite' (mit TE) eingesetzt – daher näher an der Linie."
-              }
-            ]
-          },
-          NB: {
-            name: "Nickelback",
-            tagline: "5. Defensive Back – kommt bei 3-Wide-Receiver-Formationen ins Spiel.",
-            tasks: [
-              "Ersetzt einen Linebacker gegen Pass-heavy Offenses",
-              "Deckt den dritten Receiver (Slot Receiver)",
-              "Kleiner und schneller als ein typischer LB",
-              "Wichtig im modernen Pass-orientierten Football"
-            ],
-            quiz: [
-              {
-                q: "Wann kommt der Nickelback aufs Feld?",
-                opts: ["Bei jedem Play", "Wenn die Offense drei oder mehr Wide Receiver aufstellt", "Nur bei Fieldgoal-Versuchen"],
-                correct: 1,
-                tip: "Der Name 'Nickel' kommt von der 5-Cent-Münze – er ist der 5. Defensive Back."
-              }
-            ]
-          }
-        }
-      }
-    }
-  }
+/* ════════════════════════════════════════
+   POSITIONS DATA
+════════════════════════════════════════ */
+const POS_DATA={
+  offense:{label:"Offense",groups:{
+    "O-Line":{label:"Offensive Line",positions:{
+      LT:{name:"Left Tackle",abbr:"LT",tagline:"Linker Eckpfeiler – schützt die blinde Seite des QBs gegen den besten Edge Rusher.",tasks:["Schützt C-Gap und Edge links außen","Verteidigt die blinde Seite eines rechtshändigen QBs","Nutzt Kick-Step-Technik gegen Speed Rusher","Öffnet Laufwege bei Outside Runs links"],quiz:[{q:"Warum gilt der LT oft als wertvollster O-Lineman?",opts:["Er snappt den Ball","Er schützt die blinde Seite des rechtshändigen QBs","Er führt alle Run Plays an"],correct:1,tip:"Rechtshändige QBs schauen nach rechts – links ist ihre blinde Seite."},{q:"Gegen wen kämpft der LT meistens?",opts:["Den freien Safety","Edge Rusher und Speed Pass Rusher","Den Middle Linebacker"],correct:1,tip:"Edge Rusher sind die explosivsten Verteidiger – der LT muss ihre Schnelligkeit neutralisieren."}]},
+      LG:{name:"Left Guard",abbr:"LG",tagline:"Linker Guard – schützt den B-Gap und öffnet Löcher im Run Game.",tasks:["Schützt B-Gaps neben dem Center","Zieht auf Pull Blocks bei Outside Runs","Doppelteams mit Center oder Left Tackle","Blockiert Linebackers im Second Level"],quiz:[{q:"Welchen Bereich schützt der LG primär?",opts:["A-Gap","B-Gap (zwischen Center und Tackle)","C-Gap außen"],correct:1,tip:"Der B-Gap ist der Bereich direkt neben dem Guard."},{q:"Was ist ein Pull Block?",opts:["Ein Block nach hinten","Der Guard zieht seitlich und führt den Runner um die Ecke","Ein Doppelteam mit dem TE"],correct:1,tip:"Pull Blocks sind zentral für viele Outside Runs."}]},
+      C:{name:"Center",abbr:"C",tagline:"Taktgeber der O-Line – snappt den Ball und koordiniert den gesamten Block.",tasks:["Snappt den Ball zum QB zu Beginn jedes Plays","Ruft Blocking-Anpassungen basierend auf der Defense","Schützt A-Gaps gegen Interior Pass Rusher","Kommuniziert Schutzregeln an Guards und Tackles"],quiz:[{q:"Was ist die grundlegendste Aufgabe des Centers?",opts:["Er läuft eine Route","Er snappt den Ball zum QB","Er blockt den besten Pass Rusher"],correct:1,tip:"Ohne den Snap kann kein Play beginnen."},{q:"Welche Zusatzaufgabe hat der Center vor dem Snap?",opts:["Er entscheidet, welcher WR den Ball bekommt","Er ruft Blocking-Anpassungen gegen die Defense","Er blockt den DE alleine"],correct:1,tip:"Der Center liest die Defense und kommuniziert Schutzregeln."}]},
+      RG:{name:"Right Guard",abbr:"RG",tagline:"Rechter Guard – schützt den rechten B-Gap und kann nach außen pullen.",tasks:["Schützt B-Gaps rechts neben dem Center","Zieht auf Pull Blocks bei Outside Runs rechts","Doppelteams mit Center oder Right Tackle","Engagiert sich gegen schnelle Interior Rusher"],quiz:[{q:"Welchen Gap schützt der RG primär?",opts:["A-Gap","Rechter B-Gap","C-Gap"],correct:1,tip:"Der B-Gap ist der Verantwortungsbereich des Guards."},{q:"Wann zieht ein Guard auf einen Pull Block?",opts:["Bei jedem Play","Wenn das Run Play außen geführt wird","Nur bei Pass Plays"],correct:1,tip:"Pull Blocks sind ein Kernelement der Outside Runs."}]},
+      RT:{name:"Right Tackle",abbr:"RT",tagline:"Rechter Eckpfeiler – schützt Edge rechts und eröffnet außen Laufwege.",tasks:["Schützt C-Gap und Edge rechts außen","Engagiert Edge Rusher von rechts","Öffnet Laufwege bei Outside Runs rechts","Doppelteams im Run Game mit Right Guard"],quiz:[{q:"Wie unterscheidet sich der RT vom LT?",opts:["Kein Unterschied","Der RT schützt die sehende Seite – etwas weniger kritisch als der LT","Der RT snappt den Ball"],correct:1,tip:"Rechtshändige QBs schauen nach rechts – der RT schützt die sehende Seite."},{q:"Was ist Run Blocking beim Tackle?",opts:["Er wirft den Ball","Er öffnet Lücken durch aggressives Angreifen","Er rennt mit dem Ball"],correct:1,tip:"Im Run Game wird der Tackle zum Angreifer."}]}
+    }},
+    "Backfield":{label:"Backfield",positions:{
+      QB:{name:"Quarterback",abbr:"QB",tagline:"Dirigent der Offense – liest die Defense, verteilt den Ball und führt das Team.",tasks:["Nimmt den Snap und entscheidet: Pass, Run oder Option","Liest die Defense vor dem Snap (Pre-Snap Read)","Wirft präzise Pässe unter Druck","Kann selbst laufen (Scramble oder designed Run)"],quiz:[{q:"Was bedeutet 'Pre-Snap Read'?",opts:["Er wirft vor dem Snap","Er analysiert die Defense bevor das Play beginnt","Er liest den Spielplan neu"],correct:1,tip:"Vor dem Snap erkennt der QB Coverages, Blitzes und offene Receiver."},{q:"Was ist eine Progressionslese?",opts:["Der QB gibt den Ball weiter bevor er ihn hat","Der QB schaut Receiver der Reihe nach durch bis einer frei ist","Der QB rückt vor"],correct:1,tip:"QBs haben 1st, 2nd, 3rd Read – sie arbeiten sich durch die Optionen."},{q:"Was ist ein Scramble?",opts:["Eine spezielle Passform","Der QB läuft selbst wenn kein Receiver frei ist","Ein Block-Auftrag"],correct:1,tip:"Wenn alle Receiver gedeckt sind, nutzt der QB seine Schnelligkeit."}]},
+      RB:{name:"Running Back",abbr:"RB",tagline:"Motor des Run Games – trägt den Ball, fängt Pässe und blockt für den QB.",tasks:["Nimmt Handoffs und läuft durch die Lücken","Liest Lücken schnell (Gap Reading)","Blockt Pass Rusher zum Schutz des QB","Fängt Checkdown-Pässe aus dem Backfield"],quiz:[{q:"Was ist Gap Reading?",opts:["Er liest den Spielplan","Er erkennt und wählt die beste Lücke in der Defense","Er liest die Augen des QBs"],correct:1,tip:"Gute RBs sehen Lücken entstehen und reagieren blitzschnell."},{q:"Was ist ein Checkdown Pass?",opts:["Ein langer TD Pass","Ein kurzer Pass zum RB als letzte Option","Ein Block-Befehl"],correct:1,tip:"Wenn alle Primärreceiver gedeckt sind, ist der RB die sichere, kurze Option."}]},
+      FB:{name:"Fullback",abbr:"FB",tagline:"Lead Blocker und kurzer Runner – öffnet Wege für den Running Back.",tasks:["Führt den Running Back als Lead Blocker","Trägt den Ball bei kurzen Yardage-Situationen","Blockiert Linebackers im Second Level","Fängt gelegentlich Pässe im Kurzbereich"],quiz:[{q:"Was ist die Hauptaufgabe des Fullbacks?",opts:["Lange Pässe fangen","Als Lead Blocker den Weg für den RB freimachen","Den QB wie ein Lineman schützen"],correct:1,tip:"Der FB trifft den Linebacker, damit der RB freien Weg hat."}]}
+    }},
+    "Receivers":{label:"Receivers",positions:{
+      WR:{name:"Wide Receiver",abbr:"WR",tagline:"Schnellster Spieler – läuft präzise Routen und fängt Pässe.",tasks:["Läuft präzise Routen und schüttelt Cornerbacks ab","Fängt Pässe in Bewegung unter Druck","Blockt auf Run Plays","Erzwingt Einzel-Coverage durch Schnelligkeit"],quiz:[{q:"Was ist eine Route?",opts:["Der Laufweg des RBs","Der vorher festgelegte Laufweg des Receivers","Ein Blocking-Schema"],correct:1,tip:"Routen sind präzise choreografiert – jede Millisekunde zählt."},{q:"Was ist Separation?",opts:["Er trennt sich vom Team","Er schafft Abstand zum deckenden Cornerback","Er läuft in die entgegengesetzte Richtung"],correct:1,tip:"Separation = freier Receiver. Ohne Separation kein Anspielziel."}]},
+      TE:{name:"Tight End",abbr:"TE",tagline:"Hybrid-Spieler – blockt wie ein Lineman, fängt wie ein Receiver.",tasks:["Blockt an der O-Line als 6./7. Lineman","Läuft Routen im Kurzbereich (5–15 Yards)","Bietet dem QB sichere Anspielstation in der Mitte","Kann als H-Back im Backfield eingesetzt werden"],quiz:[{q:"Was macht den TE zum Hybrid?",opts:["Er spielt zwei Positionen gleichzeitig","Er kann blocken und als Receiver fungieren","Er wechselt zwischen Offense und Defense"],correct:1,tip:"Zu groß für CBs, zu schnell für LBs – klassisches Matchup-Problem."},{q:"In welcher Zone fängt der TE typischerweise?",opts:["Deep (über 30 Yards)","Kurzbereich 5–15 Yards in der Mitte","Nur an der Seitenlinie"],correct:1,tip:"Der TE ist der safety valve des QBs – zuverlässig und schwer zu decken."}]}
+    }}
+  }},
+  defense:{label:"Defense",groups:{
+    "D-Line":{label:"Defensive Line",positions:{
+      DE:{name:"Defensive End",abbr:"DE",tagline:"Außenrandwächter – setzt den QB unter Druck und stoppt Outside Runs.",tasks:["Rusht den QB von der Außenseite","Enthält Outside Runs (Run Containment)","Setzt Speed-Moves ein (Spin, Bull Rush, Swim)","Kann als 4-3 DE oder 3-4 OLB gespielt werden"],quiz:[{q:"Was ist Run Containment beim DE?",opts:["Er fängt den Ball","Er verhindert dass der Runner außen herumkommt","Er deckt einen Receiver"],correct:1,tip:"Der DE muss Gap Discipline behalten – sonst läuft der RB außen vorbei."},{q:"Was ist ein Speed Move beim Pass Rush?",opts:["Ein schneller Rückwärtslauf","Eine Technik um den Tackle mit Schnelligkeit zu umgehen","Ein Coverage-Auftrag"],correct:1,tip:"Spin Move oder Swim Move nutzen Schnelligkeit statt pure Kraft."}]},
+      DT:{name:"Defensive Tackle",abbr:"DT",tagline:"Interior-Kraft – stört Runs und presst den QB von innen.",tasks:["Penetriert die Interior-Linie","Erzeugt Interior Pass Rush durch A- und B-Gap","Bindet Doppelteam-Blocker und macht LBs frei","Als Nose Tackle: Center 1-on-1 schlagen"],quiz:[{q:"Welche Gaps attackiert der DT primär?",opts:["Edge und C-Gap","A-Gap und B-Gap","Nur außen"],correct:1,tip:"Interior Rusher arbeiten durch die Mitte – daher Interior Pass Rush."},{q:"Was macht einen Nose Tackle besonders?",opts:["Er ist der schnellste","Er aligned gegenüber dem Center und kämpft 1-on-1","Er ist für Coverage zuständig"],correct:1,tip:"Der NT im 3-4-System ist oft der physischste Spieler auf dem Feld."}]}
+    }},
+    "Linebackers":{label:"Linebackers",positions:{
+      MLB:{name:"Middle Linebacker",abbr:"MLB",tagline:"Das Herz der Defense – Tackler, Leser und Anführer in der Mitte.",tasks:["Liest Offense-Formationen und ruft Anpassungen","Tackelt Runner die die Linie durchbrechen","Deckt TEs oder Backs in Zone Coverage","Blitzt durch A-Gaps bei Blitz-Schemes"],quiz:[{q:"Warum gilt der MLB als QB der Defense?",opts:["Er wirft gelegentlich","Er liest die Offense und ruft Coverage-Anpassungen","Er ist der schnellste"],correct:1,tip:"Wie der QB auf Offense ist der MLB für Kommunikation und Anpassungen zuständig."},{q:"In welchem Bereich ist der MLB am aktivsten?",opts:["Ganz außen","Direkt hinter der D-Line in der Mitte","In der Deep Zone"],correct:1,tip:"Der MLB patrouilliert die Mitte – zweite Verteidigungslinie nach der D-Line."}]},
+      OLB:{name:"Outside Linebacker",abbr:"OLB",tagline:"Flexibler Randbewacher – rusht, deckt oder tackelt je nach System.",tasks:["In 4-3: Coverage an der Außenlinie und tackelt","In 3-4: als Edge Rusher agiert wie ein DE","Deckt Flats, Curls und Screens","Enthält Outside Runs vom Rand"],quiz:[{q:"Wie unterscheidet sich der OLB im 3-4 vs. 4-3?",opts:["Kein Unterschied","Im 3-4 rusht er wie ein DE, im 4-3 ist er Coverage-orientierter","Im 4-3 spielt er Safety"],correct:1,tip:"Die besten 3-4 OLBs (Edge Rusher) setzen den QB ständig unter Druck."}]},
+      ILB:{name:"Inside Linebacker",abbr:"ILB",tagline:"Allrounder im Zentrum – stark im Run Stop und solide in Coverage.",tasks:["Stoppt Runs durch die Mitte","Deckt Backs und TEs in Zone Coverage","Kommuniziert Coverage-Rotationen","Kämpft sich durch Blocks ins Backfield"],quiz:[{q:"Was unterscheidet den ILB im 3-4 vom MLB im 4-3?",opts:["Nichts","Im 3-4 gibt es zwei ILBs die das Zentrum teilen","Der ILB spielt außen"],correct:1,tip:"Das 3-4-System hat zwei ILBs – sie teilen die Verantwortung des MLBs im 4-3."}]}
+    }},
+    "Secondary":{label:"Secondary",positions:{
+      CB:{name:"Cornerback",abbr:"CB",tagline:"Eins-gegen-Eins-Spezialist – schattiert Wide Receiver und verhindert Pässe.",tasks:["Deckt WR in Man Coverage 1-on-1","Spielt Zone Coverage in zugewiesenen Bereichen","Stört den Release des WRs (Press Coverage)","Tackelt bei Run Plays nahe der Sidelines"],quiz:[{q:"Was ist Press Coverage?",opts:["Er rückt auf die Linie vor und blockt","Er stört den Release des WRs direkt an der Linie","Er blitzt durch die Linie"],correct:1,tip:"Press Coverage unterbricht das Timing des WRs und QBs."},{q:"Was unterscheidet Man von Zone Coverage?",opts:["Kein Unterschied","Man = ein Verteidiger folgt einem Receiver, Zone = Bereich","Zone ist nur für Safeties"],correct:1,tip:"In Man folgt der CB dem WR überall hin – in Zone bleibt er in seinem Bereich."}]},
+      FS:{name:"Free Safety",abbr:"FS",tagline:"Letzte Verteidigungslinie – überwacht die tiefe Feldmitte.",tasks:["Überwacht tiefe Feldmitte gegen lange Pässe","Liest den QB und reagiert auf Routen","Hilft CBs in Cover-2 und Cover-3","Interceptiert schlecht platzierte Pässe"],quiz:[{q:"Warum heißt der FS 'free'?",opts:["Er ist nicht bezahlt","Er hat keinen festen Deckungsauftrag und reagiert frei","Er darf das Feld verlassen"],correct:1,tip:"Ohne Man-Coverage-Auftrag kann der FS überall helfen wo er gebraucht wird."},{q:"Was deckt der FS in Cover-3?",opts:["Er rusht den QB","Die mittlere Deep Zone alleine","Er blitzt immer"],correct:1,tip:"In Cover-3 teilen drei Verteidiger das Deep Field auf – der FS übernimmt die Mitte."}]},
+      SS:{name:"Strong Safety",abbr:"SS",tagline:"Hybrid-Verteidiger – physisch wie ein LB, aber mit Safety-Reichweite.",tasks:["Positioniert näher an der Linie gegen Run Plays","Deckt TEs und größere Receivers","Kann als Linebacker-Ersatz blitzen","Unterstützt in Cover-2 auf der starken Seite"],quiz:[{q:"Warum steht der SS näher an der Linie als der FS?",opts:["Er ist langsamer","Er ist für TE und Run Support zuständig","Er deckt die Feldmitte"],correct:1,tip:"Der SS wird auf der starken Seite mit TE eingesetzt."}]},
+      NB:{name:"Nickelback",abbr:"NB",tagline:"5. Defensive Back – kommt bei 3-WR-Formationen ins Spiel.",tasks:["Ersetzt einen LB gegen Pass-heavy Offenses","Deckt den Slot Receiver (3. WR)","Kleiner und schneller als ein typischer LB","Schlüsselspieler im modernen Pass-orientierten Football"],quiz:[{q:"Wann kommt der Nickelback aufs Feld?",opts:["Bei jedem Play","Wenn die Offense drei oder mehr WR aufstellt","Nur bei Fieldgoal-Versuchen"],correct:1,tip:"'Nickel' = 5-Cent-Münze = 5. Defensive Back."}]}
+    }}
+  }}
 };
 
-let state = {
-  phase: null,
-  group: null,
-  pos: null,
-  answers: {}
+/* ════════════════════════════════════════
+   SCHEMES DATA
+════════════════════════════════════════ */
+const SCH_DATA={
+  offense:{label:"Offense",groups:{
+    "Personnel":{label:"Personnel Packages",schemes:{
+      "11":{name:"11 Personnel",abbr:"11",tagline:"1 RB, 1 TE, 3 WR – das meistgespielte Package im modernen NFL.",
+        tasks:["1 Running Back im Backfield","1 Tight End an der Linie oder als Slot","3 Wide Receiver verteilt außen und im Slot","Zwingt die Defense zur Nickel-Aufstellung (5 DBs)"],
+        pros:"Maximale Flexibilität – Pass und Run möglich. Zwingt die Defense, einen LB durch einen DB zu ersetzen, was Pass-Coverage verbessert aber Run-Stopping schwächt.",
+        cons:"Weniger Blocking-Power als 21 oder 22 Personnel. Gegen starke Run-Defenses kann die O-Line allein kämpfen.",
+        when:"Standardsituation, 1st/2nd Down, zwei-Minuten-Drill. Der moderne NFL-Standard – über 60% aller Snaps.",
+        vsGood:["Nickel Defense (5 DB)","Zone Coverage","Leichtere Run Defenses"],
+        vsBad:["Base 4-3 mit physischen LBs","Stacked Box (8+ Verteidiger gegen den Run)"],
+        formations:["Shotgun","Pistol","Singleback"],
+        field:{players:[
+          {x:.14,y:.52,c:"#378ADD",l:"WR"},{x:.50,y:.50,c:"#5DCAA5",l:"TE"},{x:.84,y:.52,c:"#378ADD",l:"WR"},
+          {x:.28,y:.56,c:"#888",l:"LT"},{x:.37,y:.56,c:"#888",l:"LG"},{x:.46,y:.56,c:"#888",l:"C"},
+          {x:.55,y:.56,c:"#888",l:"RG"},{x:.64,y:.56,c:"#888",l:"RT"},
+          {x:.46,y:.70,c:"#C07A20",l:"QB"},{x:.46,y:.82,c:"#888",l:"RB"},
+          {x:.22,y:.52,c:"#378ADD",l:"SL"}
+        ],zones:[{x:.50,y:.40,w:.80,h:.22,c:"#378ADD",l:"Pass-Bedrohung über die gesamte Breite",op:.07}]}
+      },
+      "12":{name:"12 Personnel",abbr:"12",tagline:"1 RB, 2 TE, 2 WR – der klassische Power-Run mit Passing-Option.",
+        tasks:["1 Running Back im Backfield","2 Tight Ends – einer an der Linie, einer als H-Back oder Slot","2 Wide Receiver außen","Zwingt die Defense oft in ihre Base-Aufstellung (4-3 oder 3-4)"],
+        pros:"Maximale Blocking-Power. Zwei TEs können sowohl blocken als auch Routen laufen – sehr schwer für die Defense zu lesen. Dominant im Run Game.",
+        cons:"Weniger WR-Speed und -Tiefe als 11 Personnel. Leichteres Scouting für erfahrene Defenses. Schlechtere Deep-Pass-Optionen.",
+        when:"Run-downs (1st und 2nd Down), Red Zone, Goal Line, wenn man physische Stärke zeigen will. Klassisch bei Teams mit gutem TE.",
+        vsGood:["Base Defense (3-4 oder 4-3)","Nickel (zuviele Receiver zum decken)","Schwache Run-Stoppers"],
+        vsBad:["Dime Defense (6 DBs)","Sehr athletische LBs die TEs decken können"],
+        formations:["I-Formation","Singleback","Pro Set"],
+        field:{players:[
+          {x:.14,y:.52,c:"#378ADD",l:"WR"},{x:.84,y:.52,c:"#378ADD",l:"WR"},
+          {x:.28,y:.56,c:"#888",l:"LT"},{x:.37,y:.56,c:"#888",l:"LG"},{x:.46,y:.56,c:"#888",l:"C"},
+          {x:.55,y:.56,c:"#888",l:"RG"},{x:.64,y:.56,c:"#888",l:"RT"},
+          {x:.72,y:.54,c:"#5DCAA5",l:"TE"},{x:.50,y:.60,c:"#5DCAA5",l:"TE"},
+          {x:.46,y:.70,c:"#C07A20",l:"QB"},{x:.46,y:.82,c:"#888",l:"RB"}
+        ],zones:[{x:.50,y:.55,w:.55,h:.20,c:"#D85A30",l:"Run-Stärke durch die Mitte",op:.08}]}
+      },
+      "21":{name:"21 Personnel",abbr:"21",tagline:"2 RB, 1 TE, 2 WR – maximale Run-Power mit Fullback als Lead Blocker.",
+        tasks:["2 Running Backs: typisch RB + Fullback","1 Tight End für zusätzliches Blocking","2 Wide Receiver halten die Defense ehrlich","Fullback als Lead Blocker öffnet Holes für den RB"],
+        pros:"Stärkste Run-Formation überhaupt. FB schirmt LBs ab. Defense muss Base spielen – keine Nickel möglich ohne Matchup-Nachteile.",
+        cons:"Sehr wenige Passing-Optionen. Moderne Defenses haben sich darauf eingestellt. Telegrafiert den Run.",
+        when:"Short Yardage (3rd/4th and 1), Goal Line, wenn man das Spiel physisch dominieren will.",
+        vsGood:["Leichte Run Defenses","Base 4-3 ohne Speed-LBs","Teams die Blitzen"],
+        vsBad:["Stacked Box mit 8+ Verteidigern","Sehr athletische LBs","Nickel-Heavy Teams"],
+        formations:["I-Formation","Power-I","Pro Set"],
+        field:{players:[
+          {x:.14,y:.52,c:"#378ADD",l:"WR"},{x:.84,y:.52,c:"#378ADD",l:"WR"},
+          {x:.28,y:.56,c:"#888",l:"LT"},{x:.37,y:.56,c:"#888",l:"LG"},{x:.46,y:.56,c:"#888",l:"C"},
+          {x:.55,y:.56,c:"#888",l:"RG"},{x:.64,y:.56,c:"#888",l:"RT"},
+          {x:.72,y:.55,c:"#5DCAA5",l:"TE"},
+          {x:.46,y:.70,c:"#C07A20",l:"QB"},{x:.36,y:.80,c:"#888",l:"FB"},{x:.50,y:.82,c:"#888",l:"RB"}
+        ],zones:[{x:.46,y:.62,w:.35,h:.28,c:"#D85A30",l:"Run-Kern",op:.10}]}
+      },
+      "22":{name:"22 Personnel",abbr:"22",tagline:"2 RB, 2 TE, 1 WR – die stärkste Blocking-Formation im Football.",
+        tasks:["2 Running Backs (RB + FB)","2 Tight Ends für massives Blocking","Nur 1 Wide Receiver – kaum Passing-Bedrohung","Zwingt Defense zur Base oder sogar Heavy-Package"],
+        pros:"Unübertroffene Run-Power. Kann den Gegner physisch dominieren. Effektiv für Goal Line Plays.",
+        cons:"Fast keine Passing-Optionen. Sehr leicht zu lesen. Moderner Football spielt selten so.",
+        when:"Goal Line, 4th and 1, wenn man das Spiel physisch beenden will.",
+        vsGood:["Leichte Run Defenses","Teams ohne Stacked Box"],
+        vsBad:["Gut aufgestellte Run Defenses","Teams die alle Gaps stecken"],
+        formations:["I-Formation","Power-I","Goal Line"],
+        field:{players:[
+          {x:.84,y:.52,c:"#378ADD",l:"WR"},
+          {x:.28,y:.56,c:"#888",l:"LT"},{x:.37,y:.56,c:"#888",l:"LG"},{x:.46,y:.56,c:"#888",l:"C"},
+          {x:.55,y:.56,c:"#888",l:"RG"},{x:.64,y:.56,c:"#888",l:"RT"},
+          {x:.72,y:.55,c:"#5DCAA5",l:"TE"},{x:.20,y:.56,c:"#5DCAA5",l:"TE"},
+          {x:.46,y:.70,c:"#C07A20",l:"QB"},{x:.36,y:.80,c:"#888",l:"FB"},{x:.50,y:.82,c:"#888",l:"RB"}
+        ],zones:[{x:.46,y:.60,w:.50,h:.30,c:"#D85A30",l:"Maximale Run-Power",op:.11}]}
+      },
+      "10":{name:"10 Personnel",abbr:"10",tagline:"1 RB, 0 TE, 4 WR – maximale Speed und Pass-Bedrohung.",
+        tasks:["4 Wide Receiver verteilen die Defense über die gesamte Breite","0 Tight Ends – alles auf Speed und Routen","Zwingt Defense zur Dime-Aufstellung (6 DBs)","Erzeugt Spacing-Probleme für jeden CB"],
+        pros:"Maximale Passing-Optionen. Zwingt Defense zu leichtesten Matchups auf dem Feld. Sehr schwer zu decken bei gutem QB.",
+        cons:"Minimale Run-Bedrohung. Kaum Blocking-Power. Anfällig gegen aggressive Blitzes.",
+        when:"Obvious Pass Situations, 3rd and Long, Two-Minute Drill, wenn ein starker QB matchup-Schwächen ausnutzen soll.",
+        vsGood:["Nickel/Dime Defense","Zone Coverage","Teams mit langsamen LBs"],
+        vsBad:["Man Coverage Specialists","Aggressive Blitz-Packages","Teams mit Top-CBs"],
+        formations:["Shotgun","Spread","Empty Backfield"],
+        field:{players:[
+          {x:.10,y:.50,c:"#378ADD",l:"WR"},{x:.24,y:.53,c:"#378ADD",l:"SL"},
+          {x:.84,y:.52,c:"#378ADD",l:"WR"},{x:.72,y:.53,c:"#378ADD",l:"SR"},
+          {x:.28,y:.56,c:"#888",l:"LT"},{x:.37,y:.56,c:"#888",l:"LG"},{x:.46,y:.56,c:"#888",l:"C"},
+          {x:.55,y:.56,c:"#888",l:"RG"},{x:.64,y:.56,c:"#888",l:"RT"},
+          {x:.46,y:.70,c:"#C07A20",l:"QB"},{x:.46,y:.82,c:"#888",l:"RB"}
+        ],zones:[{x:.50,y:.38,w:.95,h:.25,c:"#378ADD",l:"4-Receiver-Spread über die gesamte Breite",op:.07}]}
+      }
+    }},
+    "Formations":{label:"Formations",schemes:{
+      "shotgun":{name:"Shotgun",abbr:"SG",tagline:"QB steht 5–7 Yards hinter dem Center – der Standard im modernen Pass-Football.",
+        tasks:["QB bekommt mehr Zeit zum Lesen der Defense","Snap geht direkt aus dem Center zum QB","Bessere Sicht auf die gesamte Defense","Ermöglicht schnelle 3-Step und 5-Step Drops"],
+        pros:"QB sieht Defense sofort vollständig. Mehr Zeit gegen Pass Rush. Ideal für Spread-Offenses und schnelle Pässe.",
+        cons:"Schwächer im QB Sneak. Run Game etwas telegrafierter. Defense weiß öfter dass ein Pass kommt.",
+        when:"Pass-Situations (2nd+ Long, 3rd Down), Spread-Offenses, No-Huddle, Two-Minute Drill.",
+        vsGood:["Zone Blitz Packages","Cover 2 und Cover 3","Slow-reacting Defenses"],
+        vsBad:["Heavy Blitz Packages","Defenses die Gaps schnell füllen","Wet/windy conditions (langer Snap riskanter)"],
+        formations:["Shotgun mit 11 Personnel","Shotgun mit 10 Personnel (Spread)","Empty Shotgun"],
+        field:{players:[
+          {x:.14,y:.52,c:"#378ADD",l:"WR"},{x:.84,y:.52,c:"#378ADD",l:"WR"},{x:.22,y:.53,c:"#378ADD",l:"SL"},
+          {x:.28,y:.56,c:"#888",l:"LT"},{x:.37,y:.56,c:"#888",l:"LG"},{x:.46,y:.56,c:"#888",l:"C"},
+          {x:.55,y:.56,c:"#888",l:"RG"},{x:.64,y:.56,c:"#888",l:"RT"},{x:.72,y:.55,c:"#5DCAA5",l:"TE"},
+          {x:.46,y:.78,c:"#C07A20",l:"QB"},{x:.58,y:.78,c:"#888",l:"RB"}
+        ],zones:[],arrows:[{x1:.46,y1:.57,x2:.46,y2:.74,c:"#EF9F27",l:"Snap ~6 Yards"}]}
+      },
+      "i-formation":{name:"I-Formation",abbr:"I",tagline:"QB, FB und RB in einer Linie – die klassische Power-Run-Formation.",
+        tasks:["QB unter dem Center (Under Center)","Fullback direkt hinter dem QB","Running Back hinter dem Fullback","Fullback als Lead Blocker in Run-Plays"],
+        pros:"Maximale Run-Power. FB kann jeden LB abschirmen. Defense weiß nicht, ob es Links, Rechts oder durch die Mitte geht. Klassisch effektiv.",
+        cons:"QB sieht Defense schlechter als aus dem Shotgun. Telegrafiert häufiger den Run. Weniger Receiver-Optionen ohne TE.",
+        when:"Power-Run Situations, Short Yardage, wenn man physische Dominanz aufbauen will. Meist mit 12 oder 21 Personnel.",
+        vsGood:["Leichte Run Defenses","Nickel (zu wenig Run-Stoppers)","Teams die Gaps nicht besetzen"],
+        vsBad:["Stacked Box","Sehr athletische MLB","Teams mit Monstrous DTs"],
+        formations:["I mit 12 Personnel","I mit 21 Personnel","Power-I"],
+        field:{players:[
+          {x:.14,y:.52,c:"#378ADD",l:"WR"},{x:.84,y:.52,c:"#378ADD",l:"WR"},
+          {x:.28,y:.56,c:"#888",l:"LT"},{x:.37,y:.56,c:"#888",l:"LG"},{x:.46,y:.56,c:"#888",l:"C"},
+          {x:.55,y:.56,c:"#888",l:"RG"},{x:.64,y:.56,c:"#888",l:"RT"},{x:.72,y:.55,c:"#5DCAA5",l:"TE"},
+          {x:.46,y:.65,c:"#C07A20",l:"QB"},{x:.46,y:.76,c:"#888",l:"FB"},{x:.46,y:.87,c:"#888",l:"RB"}
+        ],zones:[],arrows:[{x1:.46,y1:.73,x2:.46,y2:.60,c:"#D85A30",l:"Lead Block"},{x1:.46,y1:.84,x2:.46,y2:.77,c:"#378ADD",l:"Handoff"}]}
+      },
+      "pistol":{name:"Pistol",abbr:"PI",tagline:"Hybrid: QB 3–4 Yards hinter Center, RB dahinter – Run + Pass in einer Aufstellung.",
+        tasks:["QB steht kürzer als im Shotgun (3–4 statt 5–7 Yards)","RB steht direkt hinter dem QB","QB behält Sicht auf Defense wie im Shotgun","RB kann in alle Richtungen starten"],
+        pros:"Kombination aus Shotgun-Sicht und I-Formation-Run-Power. RB versteckt seine Laufrichtung länger. Zwingt Defense zur Unsicherheit.",
+        cons:"Etwas weniger Zeit für QB als im tiefen Shotgun. Schwieriger zu blocken als Under Center.",
+        when:"Spread Run-Pass-Option (RPO) Offenses. Wenn man Run und Pass gleichermaßen glaubhaft androhen will.",
+        vsGood:["Defenses die sich früh auf Run oder Pass festlegen","Zone Defenses"],
+        vsBad:["Aggressive Blitz-Packages","Man Coverage Specialists"],
+        formations:["Pistol mit 11 Personnel","Pistol mit 12 Personnel"],
+        field:{players:[
+          {x:.14,y:.52,c:"#378ADD",l:"WR"},{x:.84,y:.52,c:"#378ADD",l:"WR"},{x:.22,y:.53,c:"#378ADD",l:"SL"},
+          {x:.28,y:.56,c:"#888",l:"LT"},{x:.37,y:.56,c:"#888",l:"LG"},{x:.46,y:.56,c:"#888",l:"C"},
+          {x:.55,y:.56,c:"#888",l:"RG"},{x:.64,y:.56,c:"#888",l:"RT"},{x:.72,y:.55,c:"#5DCAA5",l:"TE"},
+          {x:.46,y:.72,c:"#C07A20",l:"QB"},{x:.46,y:.83,c:"#888",l:"RB"}
+        ],zones:[],arrows:[{x1:.46,y1:.57,x2:.46,y2:.69,c:"#EF9F27",l:"Snap ~3 Yards"}]}
+      },
+      "empty":{name:"Empty Backfield",abbr:"EB",tagline:"0 RBs im Backfield – 5 Receiver verteilen die Defense maximal.",
+        tasks:["Kein Running Back im Backfield","QB steht alleine – meistens im Shotgun","5 Receiver (WR + TE) auf dem Feld","Maximaler Stress auf die Defense-Coverage"],
+        pros:"Defense muss jeden Receiver mit einem Mann decken oder Zone Anpassungen treffen. Schafft Mismatches. Sehr schneller Spielaufbau.",
+        cons:"Null Run-Bedrohung. QB wird sofort nach dem Snap gejagt. Anfällig gegen sehr schnelle Blitzes. Sagt der Defense: es kommt ein Pass.",
+        when:"3rd and Long, Desperation Situations, wenn man große Rückstände aufholen muss. Zwei-Minuten-Drill.",
+        vsGood:["Zone Coverages","Langsame Defenses","Nickle/Dime Packages"],
+        vsBad:["Man Coverage mit guten CBs","Aggressive Blitz-Packages","4-Man Rush mit Elite Pass Rushern"],
+        formations:["Empty Shotgun mit 10 Personal","Empty mit 11 Personnel (TE als Slot)"],
+        field:{players:[
+          {x:.10,y:.50,c:"#378ADD",l:"WR"},{x:.22,y:.53,c:"#378ADD",l:"SL"},
+          {x:.84,y:.52,c:"#378ADD",l:"WR"},{x:.72,y:.53,c:"#5DCAA5",l:"TE"},{x:.50,y:.53,c:"#378ADD",l:"SR"},
+          {x:.28,y:.57,c:"#888",l:"LT"},{x:.37,y:.57,c:"#888",l:"LG"},{x:.46,y:.57,c:"#888",l:"C"},
+          {x:.55,y:.57,c:"#888",l:"RG"},{x:.64,y:.57,c:"#888",l:"RT"},
+          {x:.46,y:.72,c:"#C07A20",l:"QB"}
+        ],zones:[{x:.50,y:.42,w:.90,h:.18,c:"#378ADD",l:"5 Receiver – maximale Breite",op:.07}]}
+      }
+    }}
+  }},
+  defense:{label:"Defense",groups:{
+    "Fronts":{label:"Defensive Fronts",schemes:{
+      "4-3":{name:"4-3 Defense",abbr:"4-3",tagline:"4 Defensive Linemen, 3 Linebackers – der klassische amerikanische Basisstandard.",
+        tasks:["4 D-Linemen: 2 DEs außen + 2 DTs innen","3 Linebackers: MLB in der Mitte, 2 OLBs außen","4 Defensive Backs (2 CBs + FS + SS)","Starke Run-Defense durch 4 physische Linemen"],
+        pros:"Ausgezeichnete Run-Defense. 4 Rusher erzeugen konsistenten Pass Rush. Linebackers sind agil für Coverage. Der Standard für 'base' Defenses in der NFL.",
+        cons:"Weniger flexibel gegen Pass-heavy Offenses als 3-4. OLBs sind oft zu langsam für moderne TE/RB-Coverage. Leichter zu blocken wenn O-Line groß ist.",
+        when:"Gegen Run-orientierte Offenses. Standard-Base-Defense. Wenn man physisch in der Linie stark ist.",
+        vsGood:["Run-Heavy Offenses (21/22 Personnel)","Inside Runs","Power Formations"],
+        vsBad:["11 Personnel Spread","Empty Backfield","Sehr mobile QBs (Scrambler)"],
+        field:{players:[
+          {x:.28,y:.43,c:"#D85A30",l:"DE"},{x:.40,y:.43,c:"#D85A30",l:"DT"},{x:.56,y:.43,c:"#D85A30",l:"DT"},{x:.68,y:.43,c:"#D85A30",l:"DE"},
+          {x:.22,y:.31,c:"#E8933A",l:"OLB"},{x:.46,y:.30,c:"#E8933A",l:"MLB"},{x:.72,y:.31,c:"#E8933A",l:"OLB"},
+          {x:.10,y:.18,c:"#9B59B6",l:"CB"},{x:.88,y:.18,c:"#9B59B6",l:"CB"},{x:.46,y:.10,c:"#9B59B6",l:"FS"},{x:.66,y:.16,c:"#9B59B6",l:"SS"}
+        ],zones:[{x:.50,y:.38,w:.80,h:.16,c:"#D85A30",l:"Starke 4-Man-Front",op:.10}]}
+      },
+      "3-4":{name:"3-4 Defense",abbr:"3-4",tagline:"3 Defensive Linemen, 4 Linebackers – Flexibilität und Täuschung als Waffe.",
+        tasks:["3 D-Linemen: 1 Nose Tackle + 2 DEs","4 Linebackers: 2 ILBs + 2 OLBs (oft als Edge Rusher)","OLBs können rushen oder droppen – Defense entscheidet spät","Nose Tackle bindet doppelt und macht ILBs frei"],
+        pros:"Maximal täuschend – Defense entscheidet nach dem Snap wer rusht. OLBs sind athletischer als DEs und können covern. Schwer für OLine zu identifizieren wen sie blocken sollen.",
+        cons:"Braucht einen Elite-Nose-Tackle der 2-3 Blocker bindet. OLBs müssen sehr athletisch sein. Kann im Run Stop schwächer sein ohne starken NT.",
+        when:"Gegen Pass-orientierte Offenses. Wenn man Täuschung und Athletismus über pure Kraft setzen will.",
+        vsGood:["Pass-Heavy Offenses","QBs die Protections ausrufen","Teams mit schwachen Centers/Guards"],
+        vsBad:["Elite Run Teams (braucht guten NT)","Teams mit sehr guten OL die Gaps sauber besetzen"],
+        field:{players:[
+          {x:.34,y:.44,c:"#D85A30",l:"DE"},{x:.48,y:.43,c:"#D85A30",l:"NT"},{x:.62,y:.44,c:"#D85A30",l:"DE"},
+          {x:.22,y:.31,c:"#E8933A",l:"OLB"},{x:.38,y:.30,c:"#E8933A",l:"ILB"},{x:.58,y:.30,c:"#E8933A",l:"ILB"},{x:.74,y:.31,c:"#E8933A",l:"OLB"},
+          {x:.10,y:.18,c:"#9B59B6",l:"CB"},{x:.88,y:.18,c:"#9B59B6",l:"CB"},{x:.46,y:.10,c:"#9B59B6",l:"FS"},{x:.66,y:.16,c:"#9B59B6",l:"SS"}
+        ],zones:[{x:.50,y:.26,w:.70,h:.14,c:"#E8933A",l:"4 LBs – flexibel Rush oder Drop",op:.11}]}
+      },
+      "3-3-5":{name:"3-3-5 (Nickel)",abbr:"3-3-5",tagline:"3 DL, 3 LB, 5 DB – der moderne Standard gegen Pass-Offenses.",
+        tasks:["3 Defensive Linemen","3 Linebackers","5 Defensive Backs (inkl. Nickelback als 3. CB)","Nickelback deckt den Slot Receiver"],
+        pros:"Optimal gegen 3-WR-Formationen (11 Personnel). 5 DBs decken alle Receiver. Nickelback ist schneller als ein LB gegen Slot Routes.",
+        cons:"Anfälliger im Run Stop (nur 3 DL). Kann bei 12 Personnel und Run-Plays überfordert sein.",
+        when:"Gegen 11 Personnel (3 WR). Standard im modernen NFL – wird mehr gespielt als die 4-3 Base.",
+        vsGood:["11 Personnel","3-WR-Spreads","Pass-Situations (2nd/3rd Long)"],
+        vsBad:["12/21 Personnel mit Run","Goal Line Situations","4-Wide-Receiver Bunches"],
+        field:{players:[
+          {x:.34,y:.44,c:"#D85A30",l:"DE"},{x:.48,y:.43,c:"#D85A30",l:"DT"},{x:.62,y:.44,c:"#D85A30",l:"DE"},
+          {x:.24,y:.31,c:"#E8933A",l:"OLB"},{x:.46,y:.30,c:"#E8933A",l:"MLB"},{x:.70,y:.31,c:"#E8933A",l:"OLB"},
+          {x:.10,y:.18,c:"#9B59B6",l:"CB"},{x:.88,y:.18,c:"#9B59B6",l:"CB"},{x:.46,y:.10,c:"#9B59B6",l:"FS"},{x:.66,y:.16,c:"#9B59B6",l:"SS"},
+          {x:.24,y:.20,c:"#9B59B6",l:"NB"}
+        ],zones:[{x:.50,y:.13,w:.90,h:.16,c:"#9B59B6",l:"5-DB-Coverage gegen Spread",op:.09}]}
+      }
+    }},
+    "Coverages":{label:"Coverages",schemes:{
+      "cover0":{name:"Cover 0",abbr:"C0",tagline:"Man Coverage ohne Safety-Hilfe – maximaler Druck, maximales Risiko.",
+        tasks:["Jeder Receiver wird von einem Defender 1-on-1 gedeckt","Kein freier Safety – alle decken","Oft kombiniert mit schwerem Blitz (5-6 Rusher)","QB hat null Zeit für Lese-Fehler"],
+        pros:"Maximaler Druck auf den QB. Wenn der Blitz durchkommt, ist es ein Sack oder Forced Error. Perfekt für short-yardage Situationen.",
+        cons:"Kein Safety-Net. Ein verlorenes 1-on-1 Duell = Touchdown. Braucht Elite-CBs. Sehr riskant gegen schnelle Receiver.",
+        when:"3rd and short, Goal Line, 2-Minute-Defense wenn man sofort stoppen muss. Nur wenn man exzellente CBs hat.",
+        vsGood:["Kurze Pässe (QB hat keine Zeit)","Langsame Receiver","QBs die unter Druck Fehler machen"],
+        vsBad:["Elite-WRs gegen jeden CB","Deep Routes wenn Blitz geblockt wird","Schnelle Screens und Slants"],
+        field:{players:[
+          {x:.28,y:.43,c:"#D85A30",l:"DE"},{x:.40,y:.43,c:"#D85A30",l:"DT"},{x:.56,y:.43,c:"#D85A30",l:"DT"},{x:.68,y:.43,c:"#D85A30",l:"DE"},
+          {x:.22,y:.34,c:"#E8933A",l:"OLB"},{x:.46,y:.33,c:"#E8933A",l:"MLB"},{x:.72,y:.34,c:"#E8933A",l:"OLB"},
+          {x:.10,y:.51,c:"#9B59B6",l:"CB"},{x:.88,y:.51,c:"#9B59B6",l:"CB"},{x:.50,y:.38,c:"#9B59B6",l:"FS"},{x:.66,y:.38,c:"#9B59B6",l:"SS"}
+        ],zones:[],arrows:[{x1:.28,y1:.42,x2:.46,y2:.57,c:"#D85A30",l:"Blitz"},{x1:.68,y1:.42,x2:.46,y2:.57,c:"#D85A30",l:""},{x1:.22,y1:.32,x2:.46,y2:.57,c:"#D85A30",l:""}]}
+      },
+      "cover1":{name:"Cover 1 (Man Free)",abbr:"C1",tagline:"Man Coverage mit einem freien Safety tief – der Kompromiss aus Druck und Sicherheit.",
+        tasks:["Jeder Receiver wird 1-on-1 gedeckt","Ein Safety (FS) deckt die Deep Middle Zone frei","Ermöglicht Blitz mit einem LB oder SS","QB muss Receiver schnell finden bevor Safety hilft"],
+        pros:"Gute Balance aus Druck und Sicherheit. FS fängt tiefe Fehler auf. Erlaubt Blitz-Varianten ohne komplettes Risiko.",
+        cons:"FS kann nicht auf beiden Seiten gleichzeitig helfen. Gute WRs können CBs außen schlagen. Seam Routes durch die Mitte sind gefährlich.",
+        when:"Standard Man-Defense. Wenn man Druck ausüben will aber einen Safety-Net behalten möchte.",
+        vsGood:["Short und Medium Pässe","Offenses ohne elite Deep Threats","Run Plays (8 in the box möglich)"],
+        vsBad:["Elite-WRs die ihre CBs schlagen","Seam Routes (TE durch die Mitte)","Crossing Routes die den FS binden"],
+        field:{players:[
+          {x:.28,y:.43,c:"#D85A30",l:"DE"},{x:.40,y:.43,c:"#D85A30",l:"DT"},{x:.56,y:.43,c:"#D85A30",l:"DT"},{x:.68,y:.43,c:"#D85A30",l:"DE"},
+          {x:.22,y:.33,c:"#E8933A",l:"OLB"},{x:.46,y:.32,c:"#E8933A",l:"MLB"},{x:.72,y:.33,c:"#E8933A",l:"OLB"},
+          {x:.10,y:.50,c:"#9B59B6",l:"CB"},{x:.88,y:.50,c:"#9B59B6",l:"CB"},{x:.46,y:.10,c:"#9B59B6",l:"FS"},{x:.66,y:.38,c:"#9B59B6",l:"SS"}
+        ],zones:[{x:.46,y:.09,w:.55,h:.14,c:"#9B59B6",l:"FS – Deep Middle Zone frei",op:.15}]}
+      },
+      "cover2":{name:"Cover 2",abbr:"C2",tagline:"Zwei Safeties teilen die Deep Zone auf – solide gegen kurze und mittellange Pässe.",
+        tasks:["Zwei Safeties teilen das Deep Field (links/rechts)","CBs spielen underneath und decken Flats","4 Man Rush oder Blitz-Varianten davor","Linebacker decken Hooks und Curls in der Mitte"],
+        pros:"Sehr sicher gegen mittellange Pässe. Zwei Safeties machen tiefe Pässe schwer. CBs können aggressiv spielen da Hilfe vorhanden.",
+        cons:"Schwach gegen die Seam Route (zwischen CB und Safety). Die 'Cover-2-Schwäche': QB sieht TE oder WR zwischen den zwei Safeties. Corner Routes außen können CB überfordern.",
+        when:"Standard-Defense für 'bend but don't break'. Wenn man keine großen Plays zulassen will. Short Yardage Situationen.",
+        vsGood:["Short und Medium Pässe","Run Plays","QBs die lieber kurz spielen"],
+        vsBad:["Seam Routes (zwischen den Safeties)","Corner Routes außen oben","4 Vertical Routes"],
+        field:{players:[
+          {x:.28,y:.43,c:"#D85A30",l:"DE"},{x:.40,y:.43,c:"#D85A30",l:"DT"},{x:.56,y:.43,c:"#D85A30",l:"DT"},{x:.68,y:.43,c:"#D85A30",l:"DE"},
+          {x:.22,y:.33,c:"#E8933A",l:"OLB"},{x:.46,y:.32,c:"#E8933A",l:"MLB"},{x:.72,y:.33,c:"#E8933A",l:"OLB"},
+          {x:.10,y:.42,c:"#9B59B6",l:"CB"},{x:.88,y:.42,c:"#9B59B6",l:"CB"},{x:.28,y:.10,c:"#9B59B6",l:"FS"},{x:.70,y:.10,c:"#9B59B6",l:"SS"}
+        ],zones:[{x:.25,y:.08,w:.40,h:.20,c:"#9B59B6",l:"FS-Zone",op:.13},{x:.73,y:.08,w:.40,h:.20,c:"#9B59B6",l:"SS-Zone",op:.13},{x:.50,y:.38,w:.60,h:.12,c:"#E8933A",l:"Underneath Coverage",op:.09}]}
+      },
+      "cover3":{name:"Cover 3",abbr:"C3",tagline:"Drei Verteidiger teilen das Deep Field in drei Zonen – Sicherheit über alles.",
+        tasks:["FS deckt Deep Middle Zone","Beide CBs droppen in Deep Outside Zones","4 Underneath-Verteidiger decken Short/Medium-Zonen","Ergibt 7 Verteidiger in Coverage bei 4-Man-Rush"],
+        pros:"Sehr sicher gegen tiefe Pässe. Schwer zu schlagen wenn ausgeführt. 7-Mann-Coverage. CBs helfen im Underneath bevor sie droppen.",
+        cons:"Flat Zones (außen, kurz) können ausgenutzt werden. Bubble Screens sind effektiv. Kann gegen schnelle WRs in den Flat Zonen brechen.",
+        when:"3rd and Long wenn man keine großen Plays zulassen will. Standard-Coverage bei vielen Teams. Gut bei Regen/Wind.",
+        vsGood:["Deep Passing Games","Vertical Routes","Teams die auf lange Pässe angewiesen sind"],
+        vsBad:["Flat Routes und Bubble Screens","Crossing Routes im Intermediate","Quick Passing Game mit vielen kurzen Pässen"],
+        field:{players:[
+          {x:.28,y:.43,c:"#D85A30",l:"DE"},{x:.40,y:.43,c:"#D85A30",l:"DT"},{x:.56,y:.43,c:"#D85A30",l:"DT"},{x:.68,y:.43,c:"#D85A30",l:"DE"},
+          {x:.22,y:.33,c:"#E8933A",l:"OLB"},{x:.46,y:.32,c:"#E8933A",l:"MLB"},{x:.72,y:.33,c:"#E8933A",l:"OLB"},
+          {x:.10,y:.12,c:"#9B59B6",l:"CB"},{x:.88,y:.12,c:"#9B59B6",l:"CB"},{x:.46,y:.09,c:"#9B59B6",l:"FS"},{x:.66,y:.33,c:"#9B59B6",l:"SS"}
+        ],zones:[{x:.14,y:.08,w:.28,h:.18,c:"#9B59B6",l:"CB Deep Left",op:.12},{x:.50,y:.07,w:.28,h:.18,c:"#9B59B6",l:"FS Deep Mid",op:.15},{x:.84,y:.08,w:.28,h:.18,c:"#9B59B6",l:"CB Deep Right",op:.12},{x:.50,y:.28,w:.80,h:.12,c:"#E8933A",l:"4× Underneath",op:.08}]}
+      },
+      "cover4":{name:"Cover 4 (Quarters)",abbr:"C4",tagline:"Vier Verteidiger teilen das Deep Field – maximale Sicherheit gegen Deep Balls.",
+        tasks:["Vier Defender teilen das Deep Field in je ein Viertel","2 CBs + FS + SS decken je ein Deep Quarter","Linebackers und verbleibende DBs decken Underneath","Run Support aus Cover 4 ist ebenfalls möglich"],
+        pros:"Fast unschlagbar gegen den Deep Ball. Sehr sicher. CBs können aggressiv gegen den Run helfen da immer Tiefen-Hilfe vorhanden.",
+        cons:"Underneath-Pässe (10-15 Yards) können ausgenutzt werden. Crossing Routes durch die Mitte können Lücken finden. Schwächer gegen Route-Kombinationen.",
+        when:"3rd and Long. Wenn man einen Elite-Deep-Threat ausschalten will. Schlechtwetter.",
+        vsGood:["Go Routes und Deep Balls","4 Vertical Konzepte","Hail Mary Situations"],
+        vsBad:["Intermediate Crossing Routes","Curl/Flat-Kombinationen","Screens und Quick Passes"],
+        field:{players:[
+          {x:.28,y:.43,c:"#D85A30",l:"DE"},{x:.40,y:.43,c:"#D85A30",l:"DT"},{x:.56,y:.43,c:"#D85A30",l:"DT"},{x:.68,y:.43,c:"#D85A30",l:"DE"},
+          {x:.26,y:.33,c:"#E8933A",l:"OLB"},{x:.46,y:.32,c:"#E8933A",l:"MLB"},{x:.66,y:.33,c:"#E8933A",l:"OLB"},
+          {x:.10,y:.11,c:"#9B59B6",l:"CB"},{x:.88,y:.11,c:"#9B59B6",l:"CB"},{x:.34,y:.11,c:"#9B59B6",l:"FS"},{x:.64,y:.11,c:"#9B59B6",l:"SS"}
+        ],zones:[{x:.14,y:.07,w:.24,h:.16,c:"#9B59B6",l:"Q1",op:.13},{x:.37,y:.07,w:.24,h:.16,c:"#9B59B6",l:"Q2",op:.13},{x:.62,y:.07,w:.24,h:.16,c:"#9B59B6",l:"Q3",op:.13},{x:.85,y:.07,w:.24,h:.16,c:"#9B59B6",l:"Q4",op:.13}]}
+      },
+      "cover6":{name:"Cover 6 (Quarter-Quarter-Half)",abbr:"C6",tagline:"Hybrid: Eine Seite Quarter, andere Seite Half – maximale Anpassungsfähigkeit.",
+        tasks:["Starke Seite (TE-Seite): Cover 4 (Quarter)","Schwache Seite: Cover 2 (Half)","SS deckt auf der TE-Seite tiefer","FS deckt die schwache Seite flacher"],
+        pros:"Kann auf Formation der Offense reagieren. Sehr schwer zu lesen für den QB. Kombiniert Vorteile aus Cover 2 und Cover 4.",
+        cons:"Komplex – erfordert sehr gute Kommunikation. Fehler in der Erkennung führen zu offenen Receivern. Braucht erfahrene DBs.",
+        when:"Gegen asymmetrische Formationen (TE auf einer Seite). Wenn man QB-Lese-Fehler erzwingen will.",
+        vsGood:["Teams die Coverage-Schwächen ausnutzen wollen","Asymmetrische Formationen"],
+        vsBad:["Sehr erfahrene QBs","Symmetrische 4-Receiver-Sets"],
+        field:{players:[
+          {x:.28,y:.43,c:"#D85A30",l:"DE"},{x:.40,y:.43,c:"#D85A30",l:"DT"},{x:.56,y:.43,c:"#D85A30",l:"DT"},{x:.68,y:.43,c:"#D85A30",l:"DE"},
+          {x:.22,y:.33,c:"#E8933A",l:"OLB"},{x:.46,y:.32,c:"#E8933A",l:"MLB"},{x:.72,y:.33,c:"#E8933A",l:"OLB"},
+          {x:.10,y:.12,c:"#9B59B6",l:"CB"},{x:.88,y:.12,c:"#9B59B6",l:"CB"},{x:.28,y:.10,c:"#9B59B6",l:"FS"},{x:.68,y:.10,c:"#9B59B6",l:"SS"}
+        ],zones:[{x:.25,y:.07,w:.40,h:.20,c:"#9B59B6",l:"Half (Cover 2)",op:.10},{x:.72,y:.07,w:.36,h:.16,c:"#9B59B6",l:"Quarter (C4)",op:.14}]}
+      }
+    }}
+  }}
 };
 
-function render() {
-  document.getElementById('root').innerHTML = buildHTML();
-  attachEvents();
+/* ════════════════════════════════════════
+   FIELD POSITIONS
+════════════════════════════════════════ */
+const POS_PLAYERS={
+  offense:[{id:"LT",x:.22,y:.56},{id:"LG",x:.33,y:.56},{id:"C",x:.44,y:.56},{id:"RG",x:.55,y:.56},{id:"RT",x:.66,y:.56},{id:"TE",x:.78,y:.55},{id:"QB",x:.44,y:.69},{id:"RB",x:.44,y:.82},{id:"FB",x:.34,y:.80},{id:"WR",x:.10,y:.52},{id:"WR2",x:.90,y:.52}],
+  defense:[{id:"DE",x:.28,y:.43},{id:"DT",x:.40,y:.43},{id:"DT2",x:.54,y:.43},{id:"DE2",x:.66,y:.43},{id:"OLB",x:.20,y:.30},{id:"MLB",x:.44,y:.30},{id:"ILB",x:.44,y:.30},{id:"OLB2",x:.72,y:.30},{id:"CB",x:.08,y:.17},{id:"CB2",x:.90,y:.17},{id:"FS",x:.44,y:.09},{id:"SS",x:.68,y:.15},{id:"NB",x:.22,y:.19}]
+};
+const P2P={offense:{LT:"LT",LG:"LG",C:"C",RG:"RG",RT:"RT",QB:"QB",RB:"RB",FB:"FB",WR:"WR",TE:"TE"},defense:{DE:"DE",DT:"DT",MLB:"MLB",ILB:"ILB",OLB:"OLB",CB:"CB",FS:"FS",SS:"SS",NB:"NB"}};
+const TAC={
+  LT:{arrows:[{x1:.22,y1:.53,x2:.12,y2:.39,c:"#378ADD",l:"Edge Block"}],zones:[{x:.08,y:.36,w:.13,h:.19,c:"#378ADD",l:"C-Gap",op:.14}]},
+  LG:{arrows:[{x1:.33,y1:.53,x2:.20,y2:.37,c:"#378ADD",l:"Pull",da:1}],zones:[{x:.22,y:.41,w:.13,h:.16,c:"#378ADD",l:"B-Gap",op:.14}]},
+  C:{arrows:[{x1:.44,y1:.53,x2:.44,y2:.37,c:"#378ADD",l:"Snap"}],zones:[{x:.36,y:.39,w:.16,h:.17,c:"#378ADD",l:"A-Gap",op:.14}]},
+  RG:{arrows:[{x1:.55,y1:.53,x2:.66,y2:.37,c:"#378ADD",l:"Pull",da:1}],zones:[{x:.51,y:.41,w:.13,h:.16,c:"#378ADD",l:"B-Gap",op:.14}]},
+  RT:{arrows:[{x1:.66,y1:.53,x2:.77,y2:.39,c:"#378ADD",l:"Edge Block"}],zones:[{x:.70,y:.36,w:.13,h:.19,c:"#378ADD",l:"C-Gap",op:.14}]},
+  QB:{arrows:[{x1:.44,y1:.66,x2:.13,y2:.30,c:"#378ADD",l:"Deep Pass"},{x1:.44,y1:.66,x2:.70,y2:.48,c:"#5DCAA5",l:"Checkdown",da:1}],zones:[]},
+  RB:{arrows:[{x1:.44,y1:.80,x2:.34,y2:.59,c:"#378ADD",l:"Run"},{x1:.44,y1:.80,x2:.54,y2:.60,c:"#5DCAA5",l:"Alt.",da:1}],zones:[{x:.30,y:.53,w:.26,h:.09,c:"#378ADD",l:"Gap-Auswahl",op:.10}]},
+  FB:{arrows:[{x1:.34,y1:.78,x2:.36,y2:.60,c:"#378ADD",l:"Lead Block"}],zones:[]},
+  WR:{arrows:[{x1:.10,y1:.50,x2:.10,y2:.22,c:"#378ADD",l:"Go Route"},{x1:.10,y1:.50,x2:.27,y2:.31,c:"#5DCAA5",l:"Slant",da:1}],zones:[]},
+  TE:{arrows:[{x1:.78,y1:.52,x2:.60,y2:.29,c:"#378ADD",l:"Seam Route"},{x1:.78,y1:.52,x2:.67,y2:.60,c:"#D85A30",l:"Block"}],zones:[]},
+  DE:{arrows:[{x1:.28,y1:.41,x2:.36,y2:.60,c:"#D85A30",l:"Edge Rush"},{x1:.28,y1:.41,x2:.18,y2:.57,c:"#5DCAA5",l:"Contain",da:1}],zones:[]},
+  DT:{arrows:[{x1:.47,y1:.41,x2:.47,y2:.58,c:"#D85A30",l:"Int. Rush"}],zones:[{x:.34,y:.54,w:.24,h:.10,c:"#D85A30",l:"A/B-Gap",op:.14}]},
+  MLB:{arrows:[{x1:.44,y1:.28,x2:.44,y2:.45,c:"#D85A30",l:"Blitz"}],zones:[{x:.28,y:.16,w:.34,h:.13,c:"#5DCAA5",l:"Zone",op:.14}]},
+  ILB:{arrows:[{x1:.44,y1:.28,x2:.44,y2:.45,c:"#D85A30",l:"Blitz"}],zones:[{x:.28,y:.16,w:.34,h:.13,c:"#5DCAA5",l:"Zone",op:.14}]},
+  OLB:{arrows:[{x1:.20,y1:.28,x2:.26,y2:.44,c:"#D85A30",l:"Edge Rush"}],zones:[{x:.04,y:.09,w:.22,h:.18,c:"#5DCAA5",l:"Left flat",op:.13}]},
+  CB:{arrows:[{x1:.08,y1:.15,x2:.10,y2:.49,c:"#D85A30",l:"Man Cov."}],zones:[{x:.02,y:.04,w:.18,h:.55,c:"#5DCAA5",l:"Deep Left",op:.09}]},
+  FS:{arrows:[],zones:[{x:.25,y:.03,w:.44,h:.13,c:"#5DCAA5",l:"Deep Middle",op:.17}]},
+  SS:{arrows:[{x1:.68,y1:.13,x2:.62,y2:.37,c:"#D85A30",l:"Run Support",da:1}],zones:[{x:.58,y:.03,w:.28,h:.14,c:"#5DCAA5",l:"Strong side",op:.13}]},
+  NB:{arrows:[{x1:.22,y1:.17,x2:.18,y2:.42,c:"#D85A30",l:"Slot Cov."}],zones:[{x:.12,y:.09,w:.22,h:.37,c:"#5DCAA5",l:"Slot Zone",op:.12}]}
+};
+
+/* ════════════════════════════════════════
+   SHARED STATE
+════════════════════════════════════════ */
+let PS={phase:null,group:null,posKey:null}; // positions
+let SS2={phase:null,group:null,schKey:null}; // schemes
+let ANS={}; // quiz answers
+
+function setTab(t){
+  document.getElementById('tab-pos').style.display=t==='pos'?'block':'none';
+  document.getElementById('tab-sch').style.display=t==='sch'?'block':'none';
+  document.getElementById('tnav-pos').className='tnav'+(t==='pos'?' active':'');
+  document.getElementById('tnav-sch').className='tnav'+(t==='sch'?' active':'');
 }
 
-function buildHTML() {
-  if (!state.phase) return buildPhaseSelect();
-  if (!state.pos) return buildBrowser();
-  return buildDetail();
+/* ════════════════════════════════════════
+   POSITIONS LOGIC
+════════════════════════════════════════ */
+function showPosScreen(n){['phase','browse','detail'].forEach(s=>document.getElementById('sp-'+s).style.display=s===n?'block':'none')}
+function goPhase(){PS={phase:null,group:null,posKey:null};showPosScreen('phase')}
+function goBrowse(){showPosScreen('browse');renderPosBrowse()}
+function selPhase(ph){PS.phase=ph;PS.group=Object.keys(POS_DATA[ph].groups)[0];PS.posKey=null;showPosScreen('browse');renderPosBrowse()}
+function selGroup(gk){PS.group=gk;renderPosBrowse()}
+function selPos(gk,pk){PS.group=gk;PS.posKey=pk;showPosScreen('detail');renderPosDetail()}
+function allPosFlat(ph){const r=[];for(const gk of Object.keys(POS_DATA[ph].groups))for(const pk of Object.keys(POS_DATA[ph].groups[gk].positions))r.push({group:gk,posKey:pk});return r}
+function posCurIdx(){return allPosFlat(PS.phase).findIndex(p=>p.group===PS.group&&p.posKey===PS.posKey)}
+function navPos(d){const all=allPosFlat(PS.phase),nx=all[posCurIdx()+d];if(nx){PS.group=nx.group;PS.posKey=nx.posKey;renderPosDetail()}}
+
+function renderPosBrowse(){
+  const ph=POS_DATA[PS.phase];
+  document.getElementById('bc-ph').textContent=ph.label;
+  document.getElementById('pos-group-tabs').innerHTML=Object.entries(ph.groups).map(([gk,gv])=>`<button class="gtab${PS.group===gk?' active':''}" onclick="selGroup('${gk}')">${gv.label}</button>`).join('');
+  document.getElementById('pos-grid').innerHTML=Object.entries(ph.groups[PS.group].positions).map(([pk,pos])=>`<button class="card" onclick="selPos('${PS.group}','${pk}')"><div class="card-abbr">${pos.abbr}</div><div class="card-name">${pos.name}</div></button>`).join('');
 }
 
-function buildPhaseSelect() {
-  return `
-    <p class="section-label">Wähle eine Phase</p>
-    <div class="phase-grid">
-      ${Object.entries(DATA).map(([k, v]) => `
-        <button class="phase-btn" data-phase="${k}">
-          <div class="phase-icon">${v.icon}</div>
-          <div class="phase-label">${v.label}</div>
-          <div class="phase-sub">${v.sub}</div>
-        </button>
-      `).join('')}
+function renderPosDetail(){
+  const ph=POS_DATA[PS.phase],pos=ph.groups[PS.group].positions[PS.posKey],isOff=PS.phase==='offense';
+  document.getElementById('bc-ph2').textContent=ph.label;
+  document.getElementById('bc-grp').textContent=ph.groups[PS.group].label;
+  document.getElementById('bc-pos').textContent=pos.name;
+  document.getElementById('pos-title').textContent=pos.name;
+  document.getElementById('pos-tagline').textContent=pos.tagline;
+  const b=document.getElementById('pos-badge');b.textContent=pos.abbr;b.className='pos-badge'+(isOff?'':' def');
+  document.getElementById('task-list').innerHTML=pos.tasks.map((t,i)=>`<li class="task-item"><span class="task-n">${i+1}</span><span>${t}</span></li>`).join('');
+  document.getElementById('leg-sel').style.background=isOff?'#378ADD':'#D85A30';
+  renderPosField();renderPosQuiz();
+  const all=allPosFlat(PS.phase),idx=posCurIdx();
+  document.getElementById('btn-prev').disabled=idx<=0;
+  document.getElementById('btn-next').disabled=idx>=all.length-1;
+  document.getElementById('nav-info').textContent=`${idx+1} / ${all.length}`;
+}
+
+function renderPosField(){
+  const W=380,H=255,FX=10,FY=12,FW=W-20,FH=H-24;
+  const ph=PS.phase,pk=PS.posKey,isOff=ph==='offense';
+  const selC=isOff?'#378ADD':'#D85A30',selDk=isOff?'#185FA5':'#993C1D';
+  const players=POS_PLAYERS[ph]||[],tac=TAC[pk]||{arrows:[],zones:[]};
+  const selId=(P2P[ph]||{})[pk];
+  const scrimY=FY+FH*(isOff?.57:.52);
+  let s=svgDefs();
+  s+=fieldBase(FX,FY,FW,FH,scrimY);
+  (tac.zones||[]).forEach(z=>s+=drawZone(FX,FY,FW,FH,z));
+  (tac.arrows||[]).forEach(a=>s+=drawArrow(FX,FY,FW,FH,a));
+  const ghostY=FY+FH*(isOff?.41:.68),ghostC=isOff?'#D85A30':'#378ADD';
+  for(let i=0;i<6;i++){const gx=FX+FW*(.19+i*.137);s+=`<circle cx="${gx}" cy="${ghostY}" r="6" fill="${ghostC}" fill-opacity="0.17" stroke="${ghostC}" stroke-width="0.5" stroke-opacity="0.35"/>`;}
+  players.forEach(p=>{
+    const cx=FX+p.x*FW,cy=FY+p.y*FH,isSel=p.id===selId||(pk==='WR'&&p.id==='WR2'),r=isSel?10:7;
+    s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${isSel?selC:'rgba(136,135,128,.45)'}" stroke="${isSel?selDk:'rgba(136,135,128,.65)'}" stroke-width="${isSel?1.5:.5}"/>`;
+    s+=`<text x="${cx}" y="${cy+3.5}" text-anchor="middle" font-size="${isSel?8:7}" font-weight="700" fill="#fff" font-family="system-ui,sans-serif" opacity="${isSel?1:.85}">${p.id.replace(/[0-9]/g,'').substring(0,3)}</text>`;
+  });
+  document.getElementById('pos-field-svg').innerHTML=s;
+  document.getElementById('pos-field-note').textContent=POS_DATA[PS.phase].groups[PS.group].positions[PS.posKey].tagline;
+}
+
+function renderPosQuiz(){
+  const pos=POS_DATA[PS.phase].groups[PS.group].positions[PS.posKey];
+  renderQuiz(pos.quiz,`pos_${PS.phase}_${PS.posKey}`,'pos-quiz-score','pos-quiz-body');
+}
+
+/* ════════════════════════════════════════
+   SCHEMES LOGIC
+════════════════════════════════════════ */
+function showSchScreen(n){['phase','browse','detail'].forEach(s=>document.getElementById('ss-'+s).style.display=s===n?'block':'none')}
+function goSchPhase(){SS2={phase:null,group:null,schKey:null};showSchScreen('phase')}
+function goSchBrowse(){showSchScreen('browse');renderSchBrowse()}
+function selSchPhase(ph){SS2.phase=ph;SS2.group=Object.keys(SCH_DATA[ph].groups)[0];SS2.schKey=null;showSchScreen('browse');renderSchBrowse()}
+function selSchGroup(gk){SS2.group=gk;renderSchBrowse()}
+function selSch(gk,sk){SS2.group=gk;SS2.schKey=sk;showSchScreen('detail');renderSchDetail()}
+function allSchFlat(ph){const r=[];for(const gk of Object.keys(SCH_DATA[ph].groups))for(const sk of Object.keys(SCH_DATA[ph].groups[gk].schemes))r.push({group:gk,schKey:sk});return r}
+function schCurIdx(){return allSchFlat(SS2.phase).findIndex(s=>s.group===SS2.group&&s.schKey===SS2.schKey)}
+function navSch(d){const all=allSchFlat(SS2.phase),nx=all[schCurIdx()+d];if(nx){SS2.group=nx.group;SS2.schKey=nx.schKey;renderSchDetail()}}
+
+function renderSchBrowse(){
+  const ph=SCH_DATA[SS2.phase];
+  document.getElementById('sbc-ph').textContent=ph.label;
+  document.getElementById('sch-group-tabs').innerHTML=Object.entries(ph.groups).map(([gk,gv])=>`<button class="gtab${SS2.group===gk?' active':''}" onclick="selSchGroup('${gk}')">${gv.label}</button>`).join('');
+  document.getElementById('sch-grid').innerHTML=Object.entries(ph.groups[SS2.group].schemes).map(([sk,sch])=>`<button class="card" onclick="selSch('${SS2.group}','${sk}')"><div class="card-abbr">${sch.abbr}</div><div class="card-name">${sch.name}</div><div class="card-sub">${sch.tagline.substring(0,50)}…</div></button>`).join('');
+}
+
+function renderSchDetail(){
+  const ph=SCH_DATA[SS2.phase],sch=ph.groups[SS2.group].schemes[SS2.schKey];
+  document.getElementById('sbc-ph2').textContent=ph.label;
+  document.getElementById('sbc-grp').textContent=ph.groups[SS2.group].label;
+  document.getElementById('sbc-name').textContent=sch.name;
+  document.getElementById('sch-title').textContent=sch.name;
+  document.getElementById('sch-tagline').textContent=sch.tagline;
+  document.getElementById('sch-badge').textContent=sch.abbr;
+  document.getElementById('sch-task-list').innerHTML=sch.tasks.map((t,i)=>`<li class="task-item"><span class="task-n">${i+1}</span><span>${t}</span></li>`).join('');
+  renderSchField(sch);
+
+  // Detail cards
+  let dc=`<div class="sch-section">
+    <div class="lbl">Vorteile &amp; Nachteile</div>
+    <div class="sch-row">
+      <div class="sch-box good"><div class="sch-box-title">✓ Vorteile</div>${sch.pros}</div>
+      <div class="sch-box bad"><div class="sch-box-title">✗ Nachteile</div>${sch.cons}</div>
     </div>
-  `;
+  </div>
+  <div class="sch-section">
+    <div class="lbl">Wann einsetzen?</div>
+    <div style="font-size:13px;color:var(--text);line-height:1.6;margin-top:.4rem">${sch.when}</div>
+  </div>
+  <div class="sch-section">
+    <div class="lbl">Gut gegen &amp; schwach gegen</div>
+    <div style="margin-top:.5rem">
+      <div style="font-size:11px;font-weight:700;color:var(--text-success);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Gut gegen</div>
+      <div class="matchup-row">${(sch.vsGood||[]).map(v=>`<span class="matchup-pill good">${v}</span>`).join('')}</div>
+    </div>
+    <div style="margin-top:.75rem">
+      <div style="font-size:11px;font-weight:700;color:var(--text-danger);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Schwach gegen</div>
+      <div class="matchup-row">${(sch.vsBad||[]).map(v=>`<span class="matchup-pill bad">${v}</span>`).join('')}</div>
+    </div>
+  </div>`;
+  if(sch.formations){dc+=`<div class="sch-section"><div class="lbl">Typische Formations / Packages</div><div class="matchup-row" style="margin-top:.5rem">${sch.formations.map(f=>`<span class="matchup-pill" style="background:var(--bg-warn);color:var(--text-warn)">${f}</span>`).join('')}</div></div>`;}
+  document.getElementById('sch-detail-cards').innerHTML=dc;
+
+  const schQuiz=getSchQuiz(SS2.phase,SS2.group,SS2.schKey);
+  renderQuiz(schQuiz,`sch_${SS2.phase}_${SS2.schKey}`,'sch-quiz-score','sch-quiz-body');
+  const all=allSchFlat(SS2.phase),idx=schCurIdx();
+  document.getElementById('sbtn-prev').disabled=idx<=0;
+  document.getElementById('sbtn-next').disabled=idx>=all.length-1;
+  document.getElementById('snav-info').textContent=`${idx+1} / ${all.length}`;
 }
 
-function buildBrowser() {
-  const phase = DATA[state.phase];
-  const groups = Object.keys(phase.groups);
-  const activeGroup = state.group || groups[0];
-  const positions = phase.groups[activeGroup].positions;
-
-  return `
-    <button class="back-btn" data-back="phase">← ${phase.label}</button>
-    <p class="section-label">Gruppe</p>
-    <div class="group-row">
-      ${groups.map(g => `
-        <button class="group-btn ${g === activeGroup ? 'active' : ''}" data-group="${g}">${phase.groups[g].label}</button>
-      `).join('')}
-    </div>
-    <p class="section-label">Position wählen</p>
-    <div class="pos-grid">
-      ${Object.entries(positions).map(([abbr, pos]) => `
-        <button class="pos-card" data-pos="${abbr}">
-          <div class="pos-abbr">${abbr}</div>
-          <div class="pos-name">${pos.name}</div>
-        </button>
-      `).join('')}
-    </div>
-  `;
+function renderSchField(sch){
+  const W=380,H=255,FX=10,FY=12,FW=W-20,FH=H-24;
+  const isOff=SS2.phase==='offense';
+  const scrimY=FY+FH*(isOff?.58:.50);
+  let s=svgDefs();
+  s+=fieldBase(FX,FY,FW,FH,scrimY);
+  const fd=sch.field||{players:[],zones:[],arrows:[]};
+  (fd.zones||[]).forEach(z=>s+=drawZone(FX,FY,FW,FH,z));
+  (fd.arrows||[]).forEach(a=>s+=drawArrow(FX,FY,FW,FH,a));
+  (fd.players||[]).forEach(p=>{
+    const cx=FX+p.x*FW,cy=FY+p.y*FH,isMark=p.c==='#C07A20';
+    s+=`<circle cx="${cx}" cy="${cy}" r="${isMark?10:8}" fill="${p.c}" fill-opacity="${isMark?1:.85}" stroke="${p.c}" stroke-width="${isMark?1.5:.5}" stroke-opacity=".7"/>`;
+    s+=`<text x="${cx}" y="${cy+3.5}" text-anchor="middle" font-size="8" font-weight="700" fill="#fff" font-family="system-ui,sans-serif">${p.l}</text>`;
+  });
+  document.getElementById('sch-field-svg').innerHTML=s;
+  document.getElementById('sch-field-note').textContent=sch.tagline;
 }
 
-function buildDetail() {
-  const phase = DATA[state.phase];
-  const activeGroup = state.group || Object.keys(phase.groups)[0];
-  const pos = phase.groups[activeGroup].positions[state.pos];
-  const ansKey = state.phase + '_' + state.pos;
-  const ans = state.answers[ansKey] || {};
+/* ════════════════════════════════════════
+   QUIZ GENERATION
+════════════════════════════════════════ */
+const SCHEME_QUIZZES={
+  "11":[{q:"Was bedeutet '11 Personnel'?",opts:["1 RB, 1 WR, 3 TE","1 RB, 1 TE, 3 WR","1 QB, 1 RB, 1 TE"],correct:1,tip:"Die erste Zahl = RBs, die zweite = TEs. 11 = 1 RB + 1 TE + 3 WR."},{q:"Welche Defense zwingt 11 Personnel typischerweise auf den Platz?",opts:["Base 4-3","Nickel (5 DBs)","Dime (6 DBs)"],correct:1,tip:"3 WR = Defense braucht einen 5. DB als Nickelback um alle zu decken."}],
+  "12":[{q:"Warum ist 12 Personnel gut im Run Game?",opts:["Weil 4 WR Platz schaffen","Weil 2 TEs zusätzliches Blocking bieten","Weil der QB rennen kann"],correct:1,tip:"2 TEs = 2 zusätzliche Blocker. Die O-Line hat effektiv 7 Männer."},{q:"Was ist die Schwäche von 12 Personnel?",opts:["Zu viele Receiver","Weniger WR-Speed und -Tiefe","Der QB sieht weniger"],correct:1,tip:"Weniger WR bedeutet weniger Passing-Optionen, besonders deep."}],
+  "21":[{q:"Was ist die Hauptwaffe von 21 Personnel?",opts:["Deep Passing","Maximale Run-Power mit FB als Lead Blocker","3-WR-Spread"],correct:1,tip:"FB + RB = Lead Blocker vor dem eigentlichen Ball-Carrier. Kaum zu stoppen."},{q:"Wann spielt man typischerweise 21 Personnel?",opts:["3rd and Long","Short Yardage und Goal Line","Two-Minute Drill"],correct:1,tip:"21 ist Run-orientiert – ideal für kurze Yardage-Situationen."}],
+  "22":[{q:"Was ist die stärkste Blocking-Formation?",opts:["11 Personnel Shotgun","22 Personnel I-Formation","10 Personnel Spread"],correct:1,tip:"2 RBs + 2 TEs = 4 extra Blocker neben der O-Line."},{q:"Welchen Nachteil hat 22 Personnel?",opts:["Zu viele Receiver","Fast keine Passing-Optionen und sehr vorhersehbar","Zu wenig Blocking"],correct:1,tip:"22 telegrafiert fast immer den Run – moderne Defenses stellen sich darauf ein."}],
+  "10":[{q:"Wie viele Receiver sind bei 10 Personnel auf dem Feld?",opts:["3 WR + 1 TE = 4","4 WR + 0 TE = 4","3 WR + 2 TE = 5"],correct:1,tip:"0 TEs + 4 WRs = maximale Pass-Bedrohung über die gesamte Breite."},{q:"Welche Defense-Aufstellung zwingt 10 Personnel herbei?",opts:["Base 4-3","Nickel","Dime (6 DBs)"],correct:2,tip:"4 Receiver = Defense braucht 6 DBs (Dime), um alle zu decken."}],
+  "shotgun":[{q:"Wo steht der QB im Shotgun?",opts:["Direkt hinter dem Center","5–7 Yards hinter dem Center","3 Yards hinter dem Center (Pistol)"],correct:1,tip:"Der tiefere Stand gibt dem QB mehr Zeit und bessere Sicht."},{q:"Welchen Nachteil hat das Shotgun?",opts:["QB sieht die Defense schlechter","Schwächer im QB Sneak, Defense weiß öfter es kommt ein Pass","Weniger Zeit für den QB"],correct:1,tip:"Der QB Sneak aus dem Shotgun ist kaum möglich – und die Defense erkennt Pass-Situations öfter."}],
+  "i-formation":[{q:"Was ist das Kernprinzip der I-Formation?",opts:["Maximale Pass-Optionen","QB, FB und RB stehen in einer Linie für maximale Run-Power","QB steht tief hinter dem Center"],correct:1,tip:"Die Reihe QB-FB-RB ist das Herz der I-Formation."},{q:"Was macht der Fullback in der I-Formation?",opts:["Er fängt Pässe","Er blockt als Lead Blocker für den RB","Er schützt den QB"],correct:1,tip:"Der FB ist der erste durch die Lücke – er schirmt den Linebacker ab."}],
+  "pistol":[{q:"Was unterscheidet die Pistol von der I-Formation?",opts:["Der QB steht tiefer","QB steht kürzer als im Shotgun, RB dahinter statt daneben","Es gibt keinen RB"],correct:1,tip:"Pistol kombiniert die Sicht des Shotguns mit der Run-Power der I-Formation."},{q:"Was ist der Vorteil der Pistol für den RB?",opts:["Er kann Pässe werfen","Er kann länger seine Laufrichtung verbergen","Er hat mehr Blocking"],correct:1,tip:"Da der RB hinter dem QB steht, kann er in alle Richtungen starten."}],
+  "empty":[{q:"Wie viele Receiver sind im Empty Backfield auf dem Feld?",opts:["3","4","5"],correct:2,tip:"0 RBs = QB + 5 Receiver (WR und TE). Maximale Pass-Bedrohung."},{q:"Was ist die größte Schwäche des Empty Backfields?",opts:["Zu viele Receiver","Keine Run-Bedrohung, QB anfällig gegen Blitzes","QB sieht die Defense schlechter"],correct:1,tip:"Ohne RB gibt es keine Run-Bedrohung und keinen Blitz-Pickup."}],
+  "4-3":[{q:"Wie viele D-Linemen und Linebackers hat eine 4-3 Defense?",opts:["3 DL, 4 LB","4 DL, 3 LB","4 DL, 4 LB"],correct:1,tip:"Die Zahl im Namen: 4 Defensive Linemen, 3 Linebackers."},{q:"Wogegen ist die 4-3 besonders stark?",opts:["Pass-Heavy Offenses","Run-orientierte Offenses","Empty Backfield"],correct:1,tip:"4 physische Linemen stoppt den Run sehr effektiv."}],
+  "3-4":[{q:"Was ist der größte Vorteil der 3-4 Defense?",opts:["Stärkste Run-Defense","Maximale Täuschung – Defense entscheidet nach dem Snap wer rusht","Immer 5 Coverage-Spieler"],correct:1,tip:"Die OLBs können rushen oder covern – QB weiß nicht was kommt."},{q:"Was braucht eine 3-4 Defense zwingend?",opts:["Einen Elite-Free-Safety","Einen Elite-Nose-Tackle der 2-3 Blocker bindet","Vier schnelle CBs"],correct:1,tip:"Ohne starken NT kollabiert das 3-4-System – er ist der Schlüsselspieler."}],
+  "3-3-5":[{q:"Wann spielt man typischerweise die 3-3-5 Nickel-Defense?",opts:["Gegen 22 Personnel","Gegen 11 Personnel (3 WR)","Gegen Goal Line Situations"],correct:1,tip:"3 WR erfordern einen 5. DB – der Nickelback."},{q:"Was ist die Schwäche der 3-3-5?",opts:["Zu viele DBs","Anfälliger im Run Stop (nur 3 DL)","Zu wenige Linebacker"],correct:1,tip:"Mit nur 3 DL ist die Linie dünner besetzt – Run-Plays können schwieriger zu stoppen sein."}],
+  "cover0":[{q:"Was ist das Risiko von Cover 0?",opts:["Zu langsame Coverage","Kein Safety-Net – jedes verlorene 1-on-1 kann ein Touchdown sein","Zu viele Rusher"],correct:1,tip:"Ohne freien Safety gibt es keine Absicherung. Elite-CBs sind Pflicht."},{q:"Wann ist Cover 0 am sinnvollsten?",opts:["Bei langen Pass-Situations","3rd and short, Goal Line und mit gutem Blitz","Gegen Spread-Offenses"],correct:1,tip:"Cover 0 + schwerer Blitz ist die aggressivste Defense-Kombination im Football."}],
+  "cover1":[{q:"Was macht den Free Safety in Cover 1 besonders?",opts:["Er rusht den QB","Er deckt die Deep Middle Zone frei ohne Manndeckungs-Auftrag","Er deckt den Slot Receiver"],correct:1,tip:"'Man Free' = Man Coverage für alle, aber FS ist frei und hilft tief."},{q:"Was ist die Schwäche von Cover 1?",opts:["Zu viele Verteidiger deep","Seam Routes durch die Mitte wo FS nicht auf beiden Seiten gleichzeitig helfen kann","CBs haben keine Hilfe"],correct:1,tip:"Der FS kann nur einer Seite gleichzeitig helfen – die andere Seite ist exponiert."}],
+  "cover2":[{q:"Wie teilen die zwei Safeties das Feld in Cover 2 auf?",opts:["Vorderfeld und Hinterfeld","Linke und rechte Deep-Hälfte","Innen und außen"],correct:1,tip:"FS = Deep Left, SS = Deep Right. Jeder deckt eine Hälfte des tiefen Felds."},{q:"Was ist die berühmte Schwäche von Cover 2?",opts:["Corner Routes","Die Seam Route zwischen den zwei Safeties","Crossing Routes"],correct:1,tip:"Zwischen FS und SS gibt es ein Loch in der Mitte – Seam Routes sind Cover-2-Killer."}],
+  "cover3":[{q:"Wer deckt die drei Deep Zones in Cover 3?",opts:["3 Linebackers","FS + beide CBs","SS + FS + MLB"],correct:1,tip:"FS übernimmt die Mitte, CBs droppen in die tiefen Außenzonen."},{q:"Was ist die Schwäche von Cover 3?",opts:["Tiefe Pässe","Flat Routes und Bubble Screens in den außen-kurzen Zonen","Long Bombs"],correct:1,tip:"Die Flat Zones außen sind kurz unbesetzt wenn CBs deep droppen."}],
+  "cover4":[{q:"Wie viele Verteidiger teilen das Deep Field in Cover 4?",opts:["2","3","4"],correct:2,tip:"Cover 4 = Quarters. 4 Defender (2 CB + FS + SS) je ein Quarter."},{q:"Was ist die Schwäche von Cover 4?",opts:["Deep Balls","Intermediate Crossing Routes (10-15 Yards)","Go Routes"],correct:1,tip:"Cover 4 ist tief sehr stark, aber Intermediate Routes finden Lücken."}],
+  "cover6":[{q:"Was macht Cover 6 besonders komplex?",opts:["Es gibt 6 Rusher","Es kombiniert Cover 2 auf einer Seite mit Cover 4 auf der anderen","Es gibt 6 DBs"],correct:1,tip:"Cover 6 = Cover 4 + Cover 2 – zwei verschiedene Coverages gleichzeitig."},{q:"Wann ist Cover 6 besonders effektiv?",opts:["Gegen symmetrische Formationen","Gegen asymmetrische Formationen (TE auf einer Seite)","Gegen Empty Backfield"],correct:1,tip:"Cover 6 kann auf die stärkere Seite der Offense reagieren."}]
+};
 
-  const tasksHTML = pos.tasks.map(t => `
-    <div class="task-row"><div class="task-dot"></div><span>${t}</span></div>
-  `).join('');
+function getSchQuiz(ph,grp,sk){return SCHEME_QUIZZES[sk]||[]}
 
-  const letters = ['A', 'B', 'C', 'D'];
-
-  const quizHTML = pos.quiz.map((q, qi) => {
-    const chosen = ans[qi];
-    const revealed = chosen !== undefined;
-    const isCorrect = chosen === q.correct;
-
-    const optsHTML = q.opts.map((opt, oi) => {
-      let extraStyle = '';
-      if (revealed) {
-        if (oi === chosen && isCorrect) extraStyle = 'background:var(--bg-success);border-color:var(--border-success);color:var(--text-success)';
-        else if (oi === chosen && !isCorrect) extraStyle = 'background:var(--bg-danger);border-color:var(--border-danger);color:var(--text-danger)';
-        else if (oi === q.correct && !isCorrect) extraStyle = 'background:var(--bg-success);border-color:var(--border-success);color:var(--text-success)';
-      }
-      return `<button class="quiz-opt" data-qi="${qi}" data-oi="${oi}" ${revealed ? 'disabled' : ''} style="${extraStyle}">
-        <span class="opt-letter">${letters[oi]}</span><span>${opt}</span>
-      </button>`;
+/* ════════════════════════════════════════
+   QUIZ ENGINE
+════════════════════════════════════════ */
+function renderQuiz(questions,prefix,scoreId,bodyId){
+  const ltrs=['A','B','C','D'];
+  let ok=0,done=0;
+  questions.forEach((_,qi)=>{const k=`${prefix}_${qi}`;if(ANS[k]!==undefined){done++;if(ANS[k]===questions[qi].correct)ok++;}});
+  document.getElementById(scoreId).textContent=done>0?`${ok}/${done} richtig`:`${questions.length} Fragen`;
+  document.getElementById(bodyId).innerHTML=questions.map((q,qi)=>{
+    const k=`${prefix}_${qi}`,ch=ANS[k],rv=ch!==undefined,isc=ch===q.correct;
+    const opts=q.opts.map((o,oi)=>{
+      let cls='opt';if(rv){if(oi===ch&&isc)cls+=' correct';else if(oi===ch)cls+=' wrong';else if(oi===q.correct)cls+=' reveal';}
+      return `<button class="${cls}" data-prefix="${prefix}" data-qi="${qi}" data-oi="${oi}" ${rv?'disabled':''}><span class="opt-l">${ltrs[oi]}</span><span>${o}</span></button>`;
     }).join('');
-
-    const feedbackHTML = revealed
-      ? `<div class="feedback">${isCorrect ? '✓ Richtig!' : '✗ Falsch.'} ${q.tip}</div>`
-      : '';
-
-    return `
-      <div class="quiz-q">
-        <div class="quiz-q-text">${qi + 1}. ${q.q}</div>
-        <div class="quiz-options">${optsHTML}</div>
-        ${feedbackHTML}
-      </div>
-    `;
+    const fb=rv?`<div class="feedback">${isc?'✓ Richtig!':'✗ Falsch.'} ${q.tip}</div>`:'';
+    return `<div class="quiz-q"><div class="quiz-qn">Frage ${qi+1}</div><div class="quiz-qt">${q.q}</div><div class="opts">${opts}</div>${fb}</div>`;
   }).join('');
-
-  return `
-    <button class="back-btn" data-back="browser">← ${phase.groups[activeGroup].label}</button>
-    <div class="detail-panel">
-      <div class="detail-header">
-        <div>
-          <div class="detail-title">${pos.name}</div>
-          <div class="detail-subtitle">${pos.tagline}</div>
-        </div>
-        <div class="detail-abbr-badge">${state.pos}</div>
-      </div>
-      <div class="detail-tasks">
-        <p class="section-label" style="margin-bottom:10px">Hauptaufgaben</p>
-        ${tasksHTML}
-      </div>
-      <div class="quiz-section">
-        <p class="quiz-header">Quiz</p>
-        ${quizHTML}
-      </div>
-    </div>
-  `;
-}
-
-function attachEvents() {
-  document.querySelectorAll('[data-phase]').forEach(el => {
-    el.addEventListener('click', () => {
-      state.phase = el.dataset.phase;
-      state.group = null;
-      state.pos = null;
-      render();
-    });
-  });
-
-  document.querySelectorAll('[data-group]').forEach(el => {
-    el.addEventListener('click', () => {
-      state.group = el.dataset.group;
-      state.pos = null;
-      render();
-    });
-  });
-
-  document.querySelectorAll('[data-pos]').forEach(el => {
-    el.addEventListener('click', () => {
-      state.pos = el.dataset.pos;
-      render();
-    });
-  });
-
-  document.querySelectorAll('[data-back]').forEach(el => {
-    el.addEventListener('click', () => {
-      if (el.dataset.back === 'phase') { state.phase = null; state.group = null; state.pos = null; }
-      if (el.dataset.back === 'browser') { state.pos = null; }
-      render();
-    });
-  });
-
-  document.querySelectorAll('[data-qi]').forEach(el => {
-    el.addEventListener('click', () => {
-      const qi = parseInt(el.dataset.qi);
-      const oi = parseInt(el.dataset.oi);
-      const ansKey = state.phase + '_' + state.pos;
-      if (!state.answers[ansKey]) state.answers[ansKey] = {};
-      if (state.answers[ansKey][qi] === undefined) {
-        state.answers[ansKey][qi] = oi;
-        render();
-      }
+  document.querySelectorAll(`[data-prefix="${prefix}"]`).forEach(el=>{
+    el.addEventListener('click',()=>{
+      const qi=+el.dataset.qi,oi=+el.dataset.oi,k=`${prefix}_${qi}`;
+      if(ANS[k]===undefined){ANS[k]=oi;renderQuiz(questions,prefix,scoreId,bodyId);}
     });
   });
 }
 
-render();
+/* ════════════════════════════════════════
+   SVG HELPERS
+════════════════════════════════════════ */
+function svgDefs(){return`<defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>`}
+function fieldBase(FX,FY,FW,FH,scrimY){
+  let s=`<rect x="${FX}" y="${FY}" width="${FW}" height="${FH}" rx="5" fill="#1e4410" opacity="0.09"/>`;
+  s+=`<rect x="${FX}" y="${FY}" width="${FW}" height="${FH}" rx="5" fill="none" stroke="rgba(0,0,0,.09)" stroke-width="0.5"/>`;
+  for(let i=1;i<5;i++){const lx=FX+FW*i/5;s+=`<line x1="${lx}" y1="${FY}" x2="${lx}" y2="${FY+FH}" stroke="rgba(0,0,0,.06)" stroke-width="0.5"/>`;}
+  s+=`<rect x="${FX}" y="${FY}" width="${FW}" height="${FH*.09}" rx="4" fill="#1D9E75" opacity="0.12"/>`;
+  s+=`<line x1="${FX}" y1="${scrimY}" x2="${FX+FW}" y2="${scrimY}" stroke="#EF9F27" stroke-width="1" stroke-dasharray="5 4" opacity="0.6"/>`;
+  s+=`<text x="${FX+4}" y="${scrimY-3}" font-size="8" fill="#BA7517" font-family="system-ui,sans-serif" opacity="0.85">LoS</text>`;
+  return s;
+}
+function drawZone(FX,FY,FW,FH,z){
+  const zx=FX+z.x*FW-(z.w*FW)/2,zy=FY+z.y*FH-(z.h*FH)/2,zw=z.w*FW,zh=z.h*FH;
+  return `<rect x="${zx}" y="${zy}" width="${zw}" height="${zh}" rx="4" fill="${z.c||z.col}" opacity="${z.op}" stroke="${z.c||z.col}" stroke-width="0.5" stroke-opacity="0.4"/><text x="${zx+zw/2}" y="${zy+zh/2+3}" text-anchor="middle" font-size="8" fill="${z.c||z.col}" font-family="system-ui,sans-serif" font-weight="600" opacity="0.85">${z.l||z.lbl}</text>`;
+}
+function drawArrow(FX,FY,FW,FH,a){
+  const ax1=FX+a.x1*FW,ay1=FY+a.y1*FH,ax2=FX+a.x2*FW,ay2=FY+a.y2*FH;
+  const da=(a.da||a.dash)?"stroke-dasharray='5 3'":"";
+  let s=`<line x1="${ax1}" y1="${ay1}" x2="${ax2}" y2="${ay2}" stroke="${a.c||a.col}" stroke-width="1.8" ${da} marker-end="url(#ar)" fill="none" opacity="0.9"/>`;
+  if(a.l||a.lbl){const l=a.l||a.lbl,mx=(ax1+ax2)/2,my=(ay1+ay2)/2,dx=ax2-ax1,dy=ay2-ay1,len=Math.sqrt(dx*dx+dy*dy)+.001,nx=-dy/len*9,ny=dx/len*9;s+=`<text x="${mx+nx}" y="${my+ny+3}" text-anchor="middle" font-size="8" fill="${a.c||a.col}" font-family="system-ui,sans-serif" font-weight="600" opacity="0.9">${l}</text>`;}
+  return s;
+}
+
+/* init */
+showPosScreen('phase');showSchScreen('phase');
 </script>
 </body>
 </html>
