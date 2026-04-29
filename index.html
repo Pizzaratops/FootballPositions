@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Football Position Explorer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-info: #e6f1fb;
+    --bg-success: #eaf3de;
+    --bg-danger: #fcebeb;
+    --text: #1a1a18;
+    --text-secondary: #6b6b67;
+    --text-info: #185fa5;
+    --text-success: #3b6d11;
+    --text-danger: #a32d2d;
+    --border: rgba(0,0,0,0.12);
+    --border-hover: rgba(0,0,0,0.25);
+    --border-info: #378add;
+    --border-success: #639922;
+    --border-danger: #e24b4a;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg-secondary: #262624;
+      --bg-info: #0c447c;
+      --bg-success: #27500a;
+      --bg-danger: #791f1f;
+      --text: #f0ede8;
+      --text-secondary: #9e9b94;
+      --text-info: #85b7eb;
+      --text-success: #97c459;
+      --text-danger: #f09595;
+      --border: rgba(255,255,255,0.12);
+      --border-hover: rgba(255,255,255,0.28);
+      --border-info: #378add;
+      --border-success: #639922;
+      --border-danger: #e24b4a;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg-secondary);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .app-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .app-sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  /* Phase select */
+  .phase-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .phase-btn {
+    padding: 1.5rem 1rem;
+    border-radius: var(--radius-lg);
+    border: 0.5px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+    color: var(--text);
+  }
+  .phase-btn:hover { border-color: var(--border-hover); background: var(--bg-secondary); }
+  .phase-icon { font-size: 28px; margin-bottom: 8px; }
+  .phase-label { font-size: 16px; font-weight: 500; }
+  .phase-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+  /* Group pills */
+  .group-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .group-btn {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 0.5px solid var(--border);
+    background: var(--bg);
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.12s;
+  }
+  .group-btn:hover { border-color: var(--border-hover); background: var(--bg-secondary); }
+  .group-btn.active {
+    background: var(--bg-info);
+    color: var(--text-info);
+    border-color: var(--border-info);
+  }
+
+  /* Position cards */
+  .pos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .pos-card {
+    padding: 14px 12px;
+    border-radius: var(--radius-md);
+    border: 0.5px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    transition: all 0.12s;
+    text-align: left;
+  }
+  .pos-card:hover { border-color: var(--border-hover); background: var(--bg-secondary); }
+  .pos-abbr { font-size: 11px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.05em; }
+  .pos-name { font-size: 14px; font-weight: 500; color: var(--text); margin-top: 4px; }
+
+  /* Detail panel */
+  .detail-panel {
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .detail-abbr-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--bg-info);
+    color: var(--text-info);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .detail-title { font-size: 18px; font-weight: 500; color: var(--text); }
+  .detail-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+
+  .detail-tasks {
+    padding: 1rem 1.25rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--text);
+  }
+  .task-row:last-child { margin-bottom: 0; }
+  .task-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  /* Quiz */
+  .quiz-section { padding: 1.25rem; }
+
+  .quiz-header {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+
+  .quiz-q {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+  .quiz-q-text { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 10px; line-height: 1.5; }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 6px; }
+
+  .quiz-opt {
+    padding: 9px 12px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text);
+    transition: all 0.12s;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    width: 100%;
+    font-family: inherit;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--border-hover); background: var(--bg-secondary); }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-opt.correct { background: var(--bg-success); border-color: var(--border-success); color: var(--text-success); }
+  .quiz-opt.wrong { background: var(--bg-danger); border-color: var(--border-danger); color: var(--text-danger); }
+  .quiz-opt.reveal { background: var(--bg-success); border-color: var(--border-success); color: var(--text-success); }
+
+  .opt-letter { font-weight: 500; flex-shrink: 0; }
+
+  .feedback { font-size: 12px; margin-top: 8px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* Back button */
+  .back-btn {
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 1rem;
+    font-family: inherit;
+  }
+  .back-btn:hover { color: var(--text); }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 0.5px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="app-title">🏈 Football Position Explorer</div>
+  <div class="app-sub">Lerne alle Positionen im American Football – Erklärungen &amp; Quiz</div>
+  <div id="root"></div>
+  <div class="footer">American Football Lernhilfe &mdash; Alle Positionen mit Quiz</div>
+</div>
+
+<script>
+const DATA = {
+  offense: {
+    label: "Offense",
+    icon: "🏈",
+    sub: "Ball in der Hand",
+    groups: {
+      "O-Line": {
+        label: "Offensive Line",
+        positions: {
+          C: {
+            name: "Center",
+            tagline: "Taktgeber der O-Line – snappt den Ball und koordiniert den gesamten Block.",
+            tasks: [
+              "Snappt den Ball zum Quarterback zu Beginn jedes Plays",
+              "Ruft Blocking-Anpassungen basierend auf der Defense",
+              "Schützt den A-Gap gegen Interior-Pass-Rusher",
+              "Kommuniziert Schutzregeln an Guards und Tackles"
+            ],
+            quiz: [
+              {
+                q: "Was ist die grundlegendste Aufgabe des Centers beim Start eines Plays?",
+                opts: ["Er läuft eine Route", "Er snappt den Ball zum Quarterback", "Er blockt den besten Pass Rusher"],
+                correct: 1,
+                tip: "Ohne den Snap kann kein Play beginnen – das ist die einzigartige Aufgabe des Centers."
+              },
+              {
+                q: "Welche zusätzliche Aufgabe hat der Center vor dem Snap?",
+                opts: ["Er entscheidet, welcher WR den Ball bekommt", "Er ruft Blocking-Anpassungen gegen die Defense", "Er blockt den Defensive End alleine"],
+                correct: 1,
+                tip: "Der Center liest die Defense und kommuniziert Schutzregeln an seine Mitspieler."
+              },
+              {
+                q: "Für welchen Bereich der Linie ist der Center hauptsächlich zuständig?",
+                opts: ["Außen links (Edge)", "Interior-Druck und A-Gap", "Deep Coverage"],
+                correct: 1,
+                tip: "Die A-Gaps links und rechts vom Center sind sein primäres Verantwortungsgebiet."
+              }
+            ]
+          },
+          G: {
+            name: "Guard",
+            tagline: "Flankenschutz des Centers – schützt die B-Gaps und öffnet Löcher im Run Game.",
+            tasks: [
+              "Schützt die B-Gaps neben dem Center",
+              "Zieht auf Pull-Blocks beim Run Game",
+              "Doppelteams mit Center oder Tackle",
+              "Blockiert Linebackers bei Zone-Runs"
+            ],
+            quiz: [
+              {
+                q: "Welchen Bereich schützt der Guard primär?",
+                opts: ["A-Gap (direkt neben dem Center)", "B-Gap (zwischen Center und Tackle)", "Edge außen"],
+                correct: 1,
+                tip: "Der B-Gap ist der Bereich direkt neben dem Guard – sein Hauptverantwortungsgebiet."
+              },
+              {
+                q: "Was ist ein 'Pull Block' beim Guard?",
+                opts: ["Ein Block nach hinten zum Quarterback", "Der Guard zieht seitlich und führt den Ballträger um die Ecke", "Ein Doppelteam mit dem Tight End"],
+                correct: 1,
+                tip: "Pull Blocks sind ein wichtiges Element vieler Laufspiele – der Guard fungiert als Lead Blocker."
+              }
+            ]
+          },
+          T: {
+            name: "Tackle",
+            tagline: "Der Eckpfeiler der O-Line – schützt den QB außen gegen Edge Rusher.",
+            tasks: [
+              "Schützt die C-Gaps und Edge außen",
+              "Verhindert, dass Speed Rusher den QB sacken",
+              "Der Left Tackle schützt die blinde Seite des QB",
+              "Engagiert sich in Run Blocks auf der Außenlinie"
+            ],
+            quiz: [
+              {
+                q: "Warum ist der Left Tackle oft der wertvollste O-Lineman?",
+                opts: ["Er snappt den Ball", "Er schützt die blinde Seite eines rechtshändigen QBs", "Er zieht die meisten Pässe"],
+                correct: 1,
+                tip: "Rechtshändige QBs schauen nach rechts – links ist ihre blinde Seite. Der LT schützt sie vor dem Sack."
+              },
+              {
+                q: "Gegen wen kämpft der Tackle meist?",
+                opts: ["Den freien Safety", "Edge Rusher und Speed Pass Rusher", "Den Cornerback"],
+                correct: 1,
+                tip: "Edge Rusher sind die explosivsten Verteidiger – der Tackle muss ihre Schnelligkeit kontern."
+              }
+            ]
+          }
+        }
+      },
+      "Backfield": {
+        label: "Backfield",
+        positions: {
+          QB: {
+            name: "Quarterback",
+            tagline: "Dirigent der Offense – liest die Defense, verteilt den Ball und führt das Team.",
+            tasks: [
+              "Nimmt den Snap und entscheidet: Pass, Run oder Option",
+              "Liest die Defense vor und nach dem Snap (Pre-Snap Read)",
+              "Wirft präzise Pässe in Fenster unter Druck",
+              "Kann selbst laufen (Scramble oder designed Run)"
+            ],
+            quiz: [
+              {
+                q: "Was bedeutet 'Pre-Snap Read' für den QB?",
+                opts: ["Er wirft vor dem Snap", "Er analysiert die Defense-Aufstellung bevor das Play beginnt", "Er liest den Spielplan neu"],
+                correct: 1,
+                tip: "Vor dem Snap erkennt der QB Coverages, Blitzes und offene Receiver – eine der wichtigsten Skills."
+              },
+              {
+                q: "Was ist eine 'Progressionslese'?",
+                opts: ["Der QB gibt den Ball weiter bevor er ihn hat", "Der QB schaut Receiver der Reihe nach durch bis einer frei ist", "Der QB rückt die Linie vor"],
+                correct: 1,
+                tip: "QBs haben 1st, 2nd, 3rd Read – sie arbeiten sich durch die Receiver bis einer offen ist."
+              },
+              {
+                q: "Was ist ein 'Scramble'?",
+                opts: ["Eine spezielle Passform", "Der QB läuft selbst, wenn kein Receiver frei ist", "Ein Block-Auftrag"],
+                correct: 1,
+                tip: "Wenn alle Receiver gedeckt sind, nutzt der QB seine eigene Schnelligkeit."
+              }
+            ]
+          },
+          RB: {
+            name: "Running Back",
+            tagline: "Motor des Run Games – trägt den Ball, fängt Pässe und blockt für den QB.",
+            tasks: [
+              "Nimmt Handoffs vom QB und läuft durch die Lücken",
+              "Liest Lücken schnell (Gap Reading)",
+              "Blockt Pass Rusher zum Schutz des QB",
+              "Fängt Checkdown-Pässe aus dem Backfield"
+            ],
+            quiz: [
+              {
+                q: "Was ist 'Gap Reading' beim Running Back?",
+                opts: ["Er liest den Spielplan", "Er erkennt und wählt die beste Lücke in der Defense im Laufen", "Er liest die Augen des QBs"],
+                correct: 1,
+                tip: "Gute RBs sehen Lücken entstehen und reagieren blitzschnell – das unterscheidet Elite-RBs."
+              },
+              {
+                q: "Was ist ein 'Checkdown' Pass?",
+                opts: ["Ein langer Touchdown Pass", "Ein kurzer Pass zum RB als letzte Option des QBs", "Ein Block-Befehl"],
+                correct: 1,
+                tip: "Wenn alle Primärreceiver gedeckt sind, ist der RB oft die sichere, kurze Option."
+              }
+            ]
+          },
+          FB: {
+            name: "Fullback",
+            tagline: "Lead Blocker und kurzer Runner – öffnet Wege für den Running Back.",
+            tasks: [
+              "Führt den Running Back als Lead Blocker",
+              "Trägt den Ball bei kurzen Yardage-Situationen",
+              "Blockt Linebackers im Second Level",
+              "Fängt gelegentlich Pässe im Kurzbereich"
+            ],
+            quiz: [
+              {
+                q: "Was ist die Hauptaufgabe des Fullbacks im modernen Football?",
+                opts: ["Lange Pässe fangen", "Als Lead Blocker dem Running Back den Weg freimachen", "Den QB schützen wie ein Lineman"],
+                correct: 1,
+                tip: "Der FB trifft den Linebacker, damit der RB einen freien Weg hat – echte Teamarbeit."
+              }
+            ]
+          }
+        }
+      },
+      "Receivers": {
+        label: "Receivers",
+        positions: {
+          WR: {
+            name: "Wide Receiver",
+            tagline: "Schnellster Spieler auf dem Feld – läuft präzise Routen und fängt Pässe.",
+            tasks: [
+              "Läuft präzise Routen (Routes) und schüttelt Cornerbacks ab",
+              "Fängt Pässe in Bewegung unter Druck",
+              "Blockt auf Run Plays (Crack Blocks, Stalk Blocks)",
+              "Erzwingt Einzel-Coverage durch Schnelligkeit"
+            ],
+            quiz: [
+              {
+                q: "Was ist eine 'Route' im Football?",
+                opts: ["Der Laufweg des Running Backs", "Der vorher festgelegte Laufweg des Receivers vor dem Pass", "Ein Blocking-Schema"],
+                correct: 1,
+                tip: "Routen sind präzise choreografiert – jede Millisekunde zählt für die Timing-Abstimmung mit dem QB."
+              },
+              {
+                q: "Was ist ein 'Release' beim Wide Receiver?",
+                opts: ["Den Ball freigeben", "Die Art, wie er sich vom Cornerback am Scrimmage-Punkt löst", "Ein Block-Auftrag"],
+                correct: 1,
+                tip: "Der Release entscheidet, ob der WR überhaupt an seinem Blocker vorbeikommt und die Route laufen kann."
+              },
+              {
+                q: "Was bedeutet 'Separation' beim Receiver?",
+                opts: ["Er trennt sich vom Team", "Er schafft Abstand zum deckenden Cornerback", "Er läuft in die entgegengesetzte Richtung"],
+                correct: 1,
+                tip: "Separation = freier Receiver. Ohne Separation hat der QB kein sicheres Anspielziel."
+              }
+            ]
+          },
+          TE: {
+            name: "Tight End",
+            tagline: "Hybrid-Spieler – blockt wie ein Lineman, fängt wie ein Receiver.",
+            tasks: [
+              "Blockt an der O-Line als 6. oder 7. Lineman",
+              "Läuft Routen im Kurzbereich (5–15 Yards)",
+              "Bietet dem QB sichere Anspielstation in der Mitte",
+              "Kann als H-Back im Backfield eingesetzt werden"
+            ],
+            quiz: [
+              {
+                q: "Was macht den Tight End zum 'Hybrid-Spieler'?",
+                opts: ["Er spielt zwei Positionen gleichzeitig", "Er kann sowohl blocken als auch als Receiver fungieren", "Er wechselt zwischen Offense und Defense"],
+                correct: 1,
+                tip: "Diese Vielseitigkeit macht TEs zu Matchup-Problemen – zu groß für Cornerbacks, zu schnell für Linebackers."
+              },
+              {
+                q: "In welcher Zone fängt der TE typischerweise Pässe?",
+                opts: ["Deep (über 30 Yards)", "Kurzbereich 5–15 Yards in der Mitte", "Nur an der Seitenlinie"],
+                correct: 1,
+                tip: "Der TE ist der 'safety valve' des QBs – zuverlässig, sicher und schwer zu decken in der Mitte."
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  defense: {
+    label: "Defense",
+    icon: "🛡️",
+    sub: "Ball stoppen",
+    groups: {
+      "D-Line": {
+        label: "Defensive Line",
+        positions: {
+          DT: {
+            name: "Defensive Tackle",
+            tagline: "Interior-Kraft – stört Runs und presst den QB von innen.",
+            tasks: [
+              "Penetriert die Interior-Linie und blockiert Run Lanes",
+              "Erzeugt Interior Pass Rush durch den A- und B-Gap",
+              "Bindet Doppelteam-Blocker und macht LBs frei",
+              "Als Nose Tackle: den Center 1-on-1 schlagen"
+            ],
+            quiz: [
+              {
+                q: "Welche Gaps attackiert der Defensive Tackle primär?",
+                opts: ["Edge und C-Gap", "A-Gap und B-Gap (innen)", "Nur außen entlang der Linie"],
+                correct: 1,
+                tip: "Interior Rusher wie DTs arbeiten durch die Mitte – daher 'Interior' Pass Rush."
+              },
+              {
+                q: "Was macht ein 'Nose Tackle' besonders?",
+                opts: ["Er ist der schnellste Verteidiger", "Er aligned direkt gegenüber dem Center und kämpft 1-on-1", "Er ist für die Coverage zuständig"],
+                correct: 1,
+                tip: "Der Nose Tackle in einem 3-4-System ist oft der physischste Spieler auf dem Feld."
+              }
+            ]
+          },
+          DE: {
+            name: "Defensive End",
+            tagline: "Außenrandwächter – setzt den QB unter Druck und stoppt Outside Runs.",
+            tasks: [
+              "Rusht den QB von der Außenseite der Linie",
+              "Enthält Outside Runs (Run Containment)",
+              "Setzt Speed-Moves ein (Spin, Bull Rush, Swim)",
+              "Kann als 4-3 DE oder 3-4 OLB eingesetzt werden"
+            ],
+            quiz: [
+              {
+                q: "Was ist 'Run Containment' beim Defensive End?",
+                opts: ["Er fängt den Ball", "Er verhindert, dass der Runner außen herum gelangt", "Er deckt einen Receiver"],
+                correct: 1,
+                tip: "Der DE muss 'gap discipline' behalten – wenn er zu weit reinläuft, läuft der RB außen vorbei."
+              },
+              {
+                q: "Was ist ein 'Speed Move' beim Pass Rush?",
+                opts: ["Ein schneller Rückwärtslauf", "Eine Technik, um den Tackle mit Schnelligkeit zu umgehen", "Ein Cover-Auftrag"],
+                correct: 1,
+                tip: "Speed Moves wie der 'Spin Move' oder 'Swim Move' nutzen Schnelligkeit statt pure Kraft."
+              }
+            ]
+          }
+        }
+      },
+      "Linebackers": {
+        label: "Linebackers",
+        positions: {
+          MLB: {
+            name: "Middle Linebacker",
+            tagline: "Das Herz der Defense – Tackler, Leser und Anführer in der Mitte.",
+            tasks: [
+              "Liest Offense-Formationen und ruft Defense-Anpassungen",
+              "Tackelt Runner, die die Linie durchbrechen",
+              "Deckt Tight Ends oder Backs in Zone Coverage",
+              "Blitzt durch die A-Gaps bei Blitz-Schemes"
+            ],
+            quiz: [
+              {
+                q: "Warum gilt der Middle Linebacker als 'Quarterback der Defense'?",
+                opts: ["Er wirft gelegentlich", "Er liest die Offense und ruft Coverage-Anpassungen", "Er ist der schnellste Verteidiger"],
+                correct: 1,
+                tip: "Wie der QB auf Offense ist der MLB auf Defense für Kommunikation und Anpassungen zuständig."
+              },
+              {
+                q: "In welchem Bereich des Felds ist der MLB am aktivsten?",
+                opts: ["Ganz außen an den Sidelines", "Direkt hinter der D-Line in der Mitte", "In der Deep Zone hinter den Safeties"],
+                correct: 1,
+                tip: "Der MLB patrouilliert die Mitte – er ist die zweite Verteidigungslinie nach der D-Line."
+              }
+            ]
+          },
+          OLB: {
+            name: "Outside Linebacker",
+            tagline: "Flexibler Randbewacher – rusht, deckt oder tackelt je nach System.",
+            tasks: [
+              "In 4-3: deckt Coverage an der Außenlinie und tackelt",
+              "In 3-4: als Edge Rusher agiert wie ein DE",
+              "Deckt Flats, Curls und Screens an den Seiten",
+              "Enthält Outside Runs vom Rand"
+            ],
+            quiz: [
+              {
+                q: "Wie unterscheidet sich der OLB in einem 3-4 vs. 4-3 System?",
+                opts: ["Kein Unterschied", "Im 3-4 rusht er oft wie ein DE, im 4-3 ist er mehr Coverage-orientiert", "Im 4-3 spielt er Safety"],
+                correct: 1,
+                tip: "Die besten 3-4 OLBs (Edge Rusher) setzen den QB ständig unter Druck."
+              }
+            ]
+          },
+          ILB: {
+            name: "Inside Linebacker",
+            tagline: "Allrounder im Zentrum – stark im Run Stop und solide in Coverage.",
+            tasks: [
+              "Stoppt Runs durch die Mitte der Linie",
+              "Deckt Backs und TEs in Zone Coverage",
+              "Kommuniziert Coverage-Rotationen",
+              "Kämpft sich durch Blocks ins Backfield"
+            ],
+            quiz: [
+              {
+                q: "Was unterscheidet den ILB vom MLB im 4-3?",
+                opts: ["Nichts – sie sind identisch", "Im 3-4 gibt es zwei ILBs, die zusammen das Zentrum abdecken", "Der ILB spielt auf der Außenseite"],
+                correct: 1,
+                tip: "Das 3-4-System hat zwei Inside Linebackers – sie teilen sich die Verantwortung des MLBs im 4-3."
+              }
+            ]
+          }
+        }
+      },
+      "Secondary": {
+        label: "Secondary (Defensive Backs)",
+        positions: {
+          CB: {
+            name: "Cornerback",
+            tagline: "Eins-gegen-Eins-Spezialist – schattiert Wide Receiver und verhindert Pässe.",
+            tasks: [
+              "Deckt Wide Receiver in Man Coverage Eins-gegen-Eins",
+              "Spielt Zone Coverage und patrouilliert assigned Bereiche",
+              "Bricht auf kurze Pässe (Jams at line, Press Coverage)",
+              "Tackelt bei Run Plays nahe der Sidelines"
+            ],
+            quiz: [
+              {
+                q: "Was ist 'Press Coverage' beim Cornerback?",
+                opts: ["Er rückt auf die Linie vor und blockt", "Er positioniert sich direkt gegenüber dem WR und stört seinen Release", "Er blitzt durch die Linie"],
+                correct: 1,
+                tip: "Press Coverage unterbricht das Timing des Receivers und QBs – riskant, aber sehr effektiv."
+              },
+              {
+                q: "Was ist eine 'Interception'?",
+                opts: ["Ein Tackle hinter der Linie", "Der CB fängt einen für den Receiver bestimmten Pass", "Ein Holding-Foul"],
+                correct: 1,
+                tip: "Interceptions sind Turnover – sofortiger Ballbesitzwechsel, oft spielentscheidend."
+              },
+              {
+                q: "Was ist der Unterschied zwischen Man Coverage und Zone Coverage?",
+                opts: ["Kein Unterschied", "Man = ein Verteidiger deckt einen Receiver, Zone = Verteidiger deckt einen Bereich", "Zone ist nur für Safeties"],
+                correct: 1,
+                tip: "In Man Coverage folgt der CB dem WR überall – in Zone bleibt er in seinem Bereich."
+              }
+            ]
+          },
+          FS: {
+            name: "Free Safety",
+            tagline: "Letzte Verteidigungslinie – überwacht die tiefe Feldmitte und räumt auf.",
+            tasks: [
+              "Überwacht die tiefe Feldmitte gegen lange Pässe",
+              "Liest den QB und reagiert auf Routen",
+              "Hilft Cornerbacks in Cover-2 und Cover-3",
+              "Interceptiert schlecht platzierte Pässe"
+            ],
+            quiz: [
+              {
+                q: "Warum heißt der Free Safety 'free'?",
+                opts: ["Er ist nicht im Kader bezahlt", "Er ist ohne festen Deckungsauftrag und kann frei reagieren", "Er darf das Feld verlassen"],
+                correct: 1,
+                tip: "Ohne festen Man-Coverage-Auftrag kann der FS überall dort helfen, wo er gebraucht wird."
+              },
+              {
+                q: "Was ist der Free Safety in einem Cover-3 System?",
+                opts: ["Er rusht den QB", "Er deckt die mittlere Deep Zone alleine", "Er blitzt immer"],
+                correct: 1,
+                tip: "In Cover-3 teilen drei Verteidiger das Deep Field auf – der FS übernimmt die Mitte."
+              }
+            ]
+          },
+          SS: {
+            name: "Strong Safety",
+            tagline: "Hybrid-Verteidiger – physisch wie ein LB, aber mit Safety-Reichweite.",
+            tasks: [
+              "Positioniert näher an der Linie gegen Run Plays",
+              "Deckt Tight Ends und größere Receivers",
+              "Kann als Linebacker-Ersatz blitzen",
+              "Unterstützt in Cover-2 auf seiner Seite"
+            ],
+            quiz: [
+              {
+                q: "Warum steht der Strong Safety näher an der Linie als der Free Safety?",
+                opts: ["Er ist langsamer", "Er ist für den Tight End und Run Support zuständig", "Er deckt die Mitte des Feldes"],
+                correct: 1,
+                tip: "Der SS wird auf der 'starken Seite' (mit TE) eingesetzt – daher näher an der Linie."
+              }
+            ]
+          },
+          NB: {
+            name: "Nickelback",
+            tagline: "5. Defensive Back – kommt bei 3-Wide-Receiver-Formationen ins Spiel.",
+            tasks: [
+              "Ersetzt einen Linebacker gegen Pass-heavy Offenses",
+              "Deckt den dritten Receiver (Slot Receiver)",
+              "Kleiner und schneller als ein typischer LB",
+              "Wichtig im modernen Pass-orientierten Football"
+            ],
+            quiz: [
+              {
+                q: "Wann kommt der Nickelback aufs Feld?",
+                opts: ["Bei jedem Play", "Wenn die Offense drei oder mehr Wide Receiver aufstellt", "Nur bei Fieldgoal-Versuchen"],
+                correct: 1,
+                tip: "Der Name 'Nickel' kommt von der 5-Cent-Münze – er ist der 5. Defensive Back."
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+};
+
+let state = {
+  phase: null,
+  group: null,
+  pos: null,
+  answers: {}
+};
+
+function render() {
+  document.getElementById('root').innerHTML = buildHTML();
+  attachEvents();
+}
+
+function buildHTML() {
+  if (!state.phase) return buildPhaseSelect();
+  if (!state.pos) return buildBrowser();
+  return buildDetail();
+}
+
+function buildPhaseSelect() {
+  return `
+    <p class="section-label">Wähle eine Phase</p>
+    <div class="phase-grid">
+      ${Object.entries(DATA).map(([k, v]) => `
+        <button class="phase-btn" data-phase="${k}">
+          <div class="phase-icon">${v.icon}</div>
+          <div class="phase-label">${v.label}</div>
+          <div class="phase-sub">${v.sub}</div>
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
+function buildBrowser() {
+  const phase = DATA[state.phase];
+  const groups = Object.keys(phase.groups);
+  const activeGroup = state.group || groups[0];
+  const positions = phase.groups[activeGroup].positions;
+
+  return `
+    <button class="back-btn" data-back="phase">← ${phase.label}</button>
+    <p class="section-label">Gruppe</p>
+    <div class="group-row">
+      ${groups.map(g => `
+        <button class="group-btn ${g === activeGroup ? 'active' : ''}" data-group="${g}">${phase.groups[g].label}</button>
+      `).join('')}
+    </div>
+    <p class="section-label">Position wählen</p>
+    <div class="pos-grid">
+      ${Object.entries(positions).map(([abbr, pos]) => `
+        <button class="pos-card" data-pos="${abbr}">
+          <div class="pos-abbr">${abbr}</div>
+          <div class="pos-name">${pos.name}</div>
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
+function buildDetail() {
+  const phase = DATA[state.phase];
+  const activeGroup = state.group || Object.keys(phase.groups)[0];
+  const pos = phase.groups[activeGroup].positions[state.pos];
+  const ansKey = state.phase + '_' + state.pos;
+  const ans = state.answers[ansKey] || {};
+
+  const tasksHTML = pos.tasks.map(t => `
+    <div class="task-row"><div class="task-dot"></div><span>${t}</span></div>
+  `).join('');
+
+  const letters = ['A', 'B', 'C', 'D'];
+
+  const quizHTML = pos.quiz.map((q, qi) => {
+    const chosen = ans[qi];
+    const revealed = chosen !== undefined;
+    const isCorrect = chosen === q.correct;
+
+    const optsHTML = q.opts.map((opt, oi) => {
+      let extraStyle = '';
+      if (revealed) {
+        if (oi === chosen && isCorrect) extraStyle = 'background:var(--bg-success);border-color:var(--border-success);color:var(--text-success)';
+        else if (oi === chosen && !isCorrect) extraStyle = 'background:var(--bg-danger);border-color:var(--border-danger);color:var(--text-danger)';
+        else if (oi === q.correct && !isCorrect) extraStyle = 'background:var(--bg-success);border-color:var(--border-success);color:var(--text-success)';
+      }
+      return `<button class="quiz-opt" data-qi="${qi}" data-oi="${oi}" ${revealed ? 'disabled' : ''} style="${extraStyle}">
+        <span class="opt-letter">${letters[oi]}</span><span>${opt}</span>
+      </button>`;
+    }).join('');
+
+    const feedbackHTML = revealed
+      ? `<div class="feedback">${isCorrect ? '✓ Richtig!' : '✗ Falsch.'} ${q.tip}</div>`
+      : '';
+
+    return `
+      <div class="quiz-q">
+        <div class="quiz-q-text">${qi + 1}. ${q.q}</div>
+        <div class="quiz-options">${optsHTML}</div>
+        ${feedbackHTML}
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <button class="back-btn" data-back="browser">← ${phase.groups[activeGroup].label}</button>
+    <div class="detail-panel">
+      <div class="detail-header">
+        <div>
+          <div class="detail-title">${pos.name}</div>
+          <div class="detail-subtitle">${pos.tagline}</div>
+        </div>
+        <div class="detail-abbr-badge">${state.pos}</div>
+      </div>
+      <div class="detail-tasks">
+        <p class="section-label" style="margin-bottom:10px">Hauptaufgaben</p>
+        ${tasksHTML}
+      </div>
+      <div class="quiz-section">
+        <p class="quiz-header">Quiz</p>
+        ${quizHTML}
+      </div>
+    </div>
+  `;
+}
+
+function attachEvents() {
+  document.querySelectorAll('[data-phase]').forEach(el => {
+    el.addEventListener('click', () => {
+      state.phase = el.dataset.phase;
+      state.group = null;
+      state.pos = null;
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-group]').forEach(el => {
+    el.addEventListener('click', () => {
+      state.group = el.dataset.group;
+      state.pos = null;
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-pos]').forEach(el => {
+    el.addEventListener('click', () => {
+      state.pos = el.dataset.pos;
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-back]').forEach(el => {
+    el.addEventListener('click', () => {
+      if (el.dataset.back === 'phase') { state.phase = null; state.group = null; state.pos = null; }
+      if (el.dataset.back === 'browser') { state.pos = null; }
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-qi]').forEach(el => {
+    el.addEventListener('click', () => {
+      const qi = parseInt(el.dataset.qi);
+      const oi = parseInt(el.dataset.oi);
+      const ansKey = state.phase + '_' + state.pos;
+      if (!state.answers[ansKey]) state.answers[ansKey] = {};
+      if (state.answers[ansKey][qi] === undefined) {
+        state.answers[ansKey][qi] = oi;
+        render();
+      }
+    });
+  });
+}
+
+render();
+</script>
+</body>
+</html>
