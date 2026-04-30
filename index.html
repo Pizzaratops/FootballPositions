@@ -218,6 +218,76 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .glo-viz{margin-top:8px;border-radius:var(--r);overflow:hidden;background:var(--navy);border:.5px solid var(--border)}
 .glossar-card{cursor:default}
 .glossar-card.has-viz .glossar-term{margin-bottom:0}
+
+/* ── Progress badges ── */
+.phase-progress{font-size:10px;color:var(--text3);margin-top:5px;display:block}
+.prog-bar-wrap{height:3px;background:rgba(255,255,255,.08);border-radius:999px;margin-top:4px;overflow:hidden}
+.prog-bar-fill{height:100%;border-radius:999px;background:var(--orange);transition:width .4s}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.status-new{background:var(--text3)}
+.status-learning{background:#F0A500}
+.status-known{background:#5DCAA5}
+
+/* ── Learn tab ── */
+.learn-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px}
+.learn-stats{display:flex;gap:12px;font-size:12px;color:var(--text2)}
+.learn-stat{display:flex;align-items:center;gap:5px}
+.learn-card{border:.5px solid var(--border);border-radius:var(--rl);background:var(--navy2);overflow:hidden;max-width:680px;margin:0 auto}
+.learn-card-head{padding:1rem 1.25rem;border-bottom:.5px solid var(--border);background:var(--navy3);display:flex;align-items:center;justify-content:space-between}
+.learn-card-pos{font-size:11px;font-weight:700;color:var(--orange-lt);text-transform:uppercase;letter-spacing:.07em}
+.learn-card-body{padding:1.25rem}
+.learn-q{font-size:16px;font-weight:600;color:var(--text);line-height:1.5;margin-bottom:1.25rem}
+.learn-opts{display:flex;flex-direction:column;gap:8px}
+.learn-opt{padding:11px 14px;border:.5px solid var(--border);border-radius:var(--r);background:var(--navy3);font-size:14px;cursor:pointer;text-align:left;color:var(--text);display:flex;gap:10px;align-items:flex-start;width:100%;font-family:inherit;line-height:1.4;transition:all .12s}
+.learn-opt:hover:not(:disabled){border-color:var(--orange);background:var(--navy4)}
+.learn-opt:disabled{cursor:default}
+.learn-opt.correct{background:rgba(240,165,0,.15);border-color:rgba(240,165,0,.5);color:#F0A500}
+.learn-opt.wrong{background:var(--red-dim);border-color:rgba(216,58,58,.5);color:#F08080}
+.learn-opt.reveal{background:rgba(240,165,0,.08);border-color:rgba(240,165,0,.3);color:#F0A500;opacity:.6}
+.learn-opt-l{font-weight:700;flex-shrink:0;font-size:12px;padding-top:1px;color:var(--orange-lt)}
+.learn-feedback{margin-top:1rem;padding:.75rem 1rem;background:var(--navy);border-radius:var(--r);border-left:2px solid var(--orange);font-size:13px;color:var(--text2);line-height:1.6}
+.learn-actions{display:flex;gap:8px;margin-top:1.25rem;flex-wrap:wrap}
+.learn-btn{padding:9px 20px;border-radius:var(--r);border:.5px solid;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .12s}
+.learn-btn.primary{background:var(--orange);border-color:var(--orange);color:#fff}
+.learn-btn.primary:hover{background:var(--orange-lt);border-color:var(--orange-lt)}
+.learn-btn.secondary{background:transparent;border-color:var(--border);color:var(--text2)}
+.learn-btn.secondary:hover{border-color:var(--border2);color:var(--text)}
+.learn-done{text-align:center;padding:3rem 1rem;color:var(--text2)}
+.learn-done-icon{font-size:48px;margin-bottom:1rem}
+.learn-done-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:.5rem}
+.progress-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:1rem}
+.prog-card{padding:.75rem 1rem;border-radius:var(--r);border:.5px solid var(--border);background:var(--navy2)}
+.prog-card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px}
+.prog-nums{display:flex;gap:8px;font-size:11px;margin-bottom:5px}
+
+/* ── Matchup tab ── */
+.matchup-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:600px){.matchup-grid{grid-template-columns:1fr}}
+.matchup-panel{border:.5px solid var(--border);border-radius:var(--rl);background:var(--navy2);overflow:hidden}
+.matchup-panel-head{padding:.65rem 1rem;border-bottom:.5px solid var(--border);background:var(--navy3);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.matchup-panel-head.off{color:var(--orange-lt)}
+.matchup-panel-head.def{color:#F08080}
+.matchup-select{padding:.9rem 1rem}
+.msel{width:100%;padding:8px 10px;border-radius:var(--r);border:.5px solid var(--border);background:var(--navy3);color:var(--text);font-size:13px;font-family:inherit;margin-bottom:8px;cursor:pointer}
+.msel:focus{outline:none;border-color:var(--orange)}
+.matchup-field-wrap{border:.5px solid var(--border);border-radius:var(--rl);background:var(--navy2);overflow:hidden;margin-bottom:14px}
+.matchup-analysis{border:.5px solid var(--border);border-radius:var(--rl);background:var(--navy2);overflow:hidden}
+.analysis-head{padding:.65rem 1.25rem;border-bottom:.5px solid var(--border);background:var(--navy3);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2)}
+.analysis-body{padding:1.25rem}
+.analysis-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:500px){.analysis-row{grid-template-columns:1fr}}
+.analysis-box{padding:.75rem 1rem;border-radius:var(--r);border:.5px solid var(--border);font-size:12px;line-height:1.6}
+.analysis-box.adv{background:rgba(240,165,0,.10);border-color:rgba(240,165,0,.3);color:#F0C060}
+.analysis-box.dis{background:var(--red-dim);border-color:rgba(216,58,58,.3);color:#F08080}
+.analysis-box.tip{background:var(--orange-dim);border-color:var(--border-o);color:var(--orange-lt)}
+.analysis-box.key{background:rgba(93,202,165,.08);border-color:rgba(93,202,165,.3);color:#5DCAA5}
+.analysis-box-title{font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;opacity:.8}
+.matchup-verdict{display:flex;align-items:center;gap:10px;padding:.75rem 1.25rem;border-top:.5px solid var(--border);font-size:13px;font-weight:600}
+.verdict-badge{padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700}
+.verdict-off{background:var(--orange-dim2);color:var(--orange-lt);border:.5px solid var(--border-o)}
+.verdict-def{background:var(--red-dim);color:#F08080;border:.5px solid rgba(216,58,58,.4)}
+.verdict-even{background:rgba(93,202,165,.12);color:#5DCAA5;border:.5px solid rgba(93,202,165,.3)}
+.matchup-reshuffle{display:flex;justify-content:center;margin-top:10px}
 </style>
 </head>
 <body>
@@ -231,6 +301,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
     <button class="tnav active" id="tnav-pos" onclick="setTab('pos')">Positionen</button>
     <button class="tnav" id="tnav-sch" onclick="setTab('sch')">Schemes &amp; Formations</button>
     <button class="tnav" id="tnav-glo" onclick="setTab('glo')">Glossar</button>
+    <button class="tnav" id="tnav-learn" onclick="setTab('learn')">🧠 Lernen</button>
+    <button class="tnav" id="tnav-matchup" onclick="setTab('matchup')">⚔️ Matchup</button>
   </div>
 
   <!-- ══════════════════ TAB: POSITIONEN ══════════════════ -->
@@ -352,6 +424,87 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
     <div class="lbl" style="margin-bottom:.5rem">Football-Begriffe von A–Z</div>
     <div class="glossar-filter" id="glo-filter"></div>
     <div class="glossar-grid" id="glo-grid"></div>
+  </div>
+
+  <!-- ══════════════════ TAB: LERNEN ══════════════════ -->
+  <div id="tab-learn" style="display:none">
+    <div class="learn-header">
+      <div>
+        <div class="lbl" style="margin-bottom:4px">Spaced Repetition</div>
+        <div style="font-size:13px;color:var(--text2)">Fragen kommen wieder bis du sie wirklich kennst.</div>
+      </div>
+      <div class="learn-stats">
+        <div class="learn-stat"><span class="status-dot status-new"></span><span id="stat-new">0</span> Neu</div>
+        <div class="learn-stat"><span class="status-dot status-learning"></span><span id="stat-learning">0</span> Lernen</div>
+        <div class="learn-stat"><span class="status-dot status-known"></span><span id="stat-known">0</span> Gelernt</div>
+      </div>
+    </div>
+    <div id="learn-card-wrap"></div>
+    <div style="margin-top:1.5rem">
+      <div class="lbl">Fortschritt nach Position</div>
+      <div class="progress-grid" id="progress-grid"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ TAB: MATCHUP ══════════════════ -->
+  <div id="tab-matchup" style="display:none">
+    <div style="font-size:13px;color:var(--text2);margin-bottom:1.25rem">Stelle Offense und Defense gegenüber. Sieh wer den Vorteil hat und warum.</div>
+    <div class="matchup-grid">
+      <div class="matchup-panel">
+        <div class="matchup-panel-head off">🏈 Offense</div>
+        <div class="matchup-select">
+          <div class="lbl">Personnel Package</div>
+          <select class="msel" id="m-personnel" onchange="renderMatchup()">
+            <option value="11">11 Personnel (1 RB, 1 TE, 3 WR)</option>
+            <option value="12">12 Personnel (1 RB, 2 TE, 2 WR)</option>
+            <option value="21">21 Personnel (2 RB, 1 TE, 2 WR)</option>
+            <option value="22">22 Personnel (2 RB, 2 TE, 1 WR)</option>
+            <option value="10">10 Personnel (1 RB, 0 TE, 4 WR)</option>
+          </select>
+          <div class="lbl">Formation</div>
+          <select class="msel" id="m-formation" onchange="renderMatchup()">
+            <option value="shotgun">Shotgun</option>
+            <option value="i-formation">I-Formation</option>
+            <option value="pistol">Pistol</option>
+            <option value="empty">Empty Backfield</option>
+          </select>
+        </div>
+      </div>
+      <div class="matchup-panel">
+        <div class="matchup-panel-head def">🛡️ Defense</div>
+        <div class="matchup-select">
+          <div class="lbl">Front</div>
+          <select class="msel" id="m-front" onchange="renderMatchup()">
+            <option value="4-3">4-3 Defense</option>
+            <option value="3-4">3-4 Defense</option>
+            <option value="3-3-5">3-3-5 Nickel</option>
+          </select>
+          <div class="lbl">Coverage</div>
+          <select class="msel" id="m-coverage" onchange="renderMatchup()">
+            <option value="cover0">Cover 0 (Man, kein Safety)</option>
+            <option value="cover1">Cover 1 (Man Free)</option>
+            <option value="cover2">Cover 2</option>
+            <option value="cover3">Cover 3</option>
+            <option value="cover4">Cover 4 (Quarters)</option>
+            <option value="cover6">Cover 6</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="matchup-field-wrap">
+      <div style="padding:.65rem 1rem;border-bottom:.5px solid var(--border);background:var(--navy3);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2)">Felddiagramm</div>
+      <div style="padding:10px;background:var(--navy)">
+        <svg width="100%" viewBox="0 0 560 300" id="matchup-svg" style="display:block"></svg>
+      </div>
+    </div>
+    <div class="matchup-analysis">
+      <div class="analysis-head">Analyse</div>
+      <div class="analysis-body" id="matchup-analysis-body"></div>
+      <div class="matchup-verdict" id="matchup-verdict"></div>
+    </div>
+    <div class="matchup-reshuffle">
+      <button class="learn-btn secondary" onclick="randomMatchup()" style="margin-top:8px">🎲 Zufälliges Matchup</button>
+    </div>
   </div>
 
 </div>
@@ -818,11 +971,13 @@ let SS2={phase:null,group:null,schKey:null}; // schemes
 let ANS={}; // quiz answers
 
 function setTab(t){
-  ['pos','sch','glo'].forEach(n=>{
+  ['pos','sch','glo','learn','matchup'].forEach(n=>{
     document.getElementById('tab-'+n).style.display=n===t?'block':'none';
     document.getElementById('tnav-'+n).className='tnav'+(n===t?' active':'');
   });
   if(t==='glo') renderGlossar();
+  if(t==='learn') renderLearnTab();
+  if(t==='matchup') renderMatchup();
 }
 
 /* ════════════════════════════════════════
@@ -1873,9 +2028,510 @@ function renderGlossar(){
   }).join('');
 }
 
+
+/* ════════════════════════════════════════
+   SPACED REPETITION ENGINE
+════════════════════════════════════════ */
+
+const SR = (() => {
+  const STORAGE_KEY = 'firstdown_sr_v1';
+  let cards = {}; // key -> {ease, interval, due, reps, status}
+
+  // Build all quiz cards from POS_DATA
+  function buildAllCards(){
+    const all = [];
+    ['offense','defense','special'].forEach(ph => {
+      const phData = POS_DATA[ph];
+      Object.keys(phData.groups).forEach(gk => {
+        Object.keys(phData.groups[gk].positions).forEach(pk => {
+          const pos = phData.groups[gk].positions[pk];
+          (pos.quiz||[]).forEach((q,qi) => {
+            all.push({
+              id: `${ph}__${pk}__${qi}`,
+              phase: ph, group: gk, posKey: pk, posName: pos.name,
+              q: q.q, opts: q.opts, correct: q.correct, tip: q.tip
+            });
+          });
+        });
+      });
+    });
+    return all;
+  }
+
+  function load(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      cards = raw ? JSON.parse(raw) : {};
+    } catch(e){ cards = {}; }
+  }
+
+  function save(){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cards)); } catch(e){}
+  }
+
+  function getCard(id){
+    if(!cards[id]) cards[id] = {ease:2.5, interval:0, due:0, reps:0, status:'new'};
+    return cards[id];
+  }
+
+  function answer(id, correct){
+    const c = getCard(id);
+    const now = Date.now();
+    if(correct){
+      c.reps++;
+      if(c.reps === 1){ c.interval = 1; }
+      else if(c.reps === 2){ c.interval = 6; }
+      else { c.interval = Math.round(c.interval * c.ease); }
+      c.ease = Math.max(1.3, c.ease + 0.1);
+      c.status = c.reps >= 2 ? 'known' : 'learning';
+    } else {
+      c.reps = 0;
+      c.interval = 0;
+      c.ease = Math.max(1.3, c.ease - 0.2);
+      c.status = 'learning';
+    }
+    c.due = now + c.interval * 60 * 1000; // interval in minutes for demo; real = days
+    save();
+  }
+
+  function getDue(){
+    const all = buildAllCards();
+    const now = Date.now();
+    // First: overdue or new
+    const due = all.filter(c => {
+      const cd = getCard(c.id);
+      return cd.due <= now;
+    });
+    // Sort: new first, then by due time
+    due.sort((a,b) => {
+      const ca = getCard(a.id), cb = getCard(b.id);
+      if(ca.status === 'new' && cb.status !== 'new') return -1;
+      if(cb.status === 'new' && ca.status !== 'new') return 1;
+      return ca.due - cb.due;
+    });
+    return due;
+  }
+
+  function getStats(){
+    const all = buildAllCards();
+    const now = Date.now();
+    let nNew=0, nLearning=0, nKnown=0, nDue=0;
+    all.forEach(c => {
+      const cd = getCard(c.id);
+      if(cd.status==='new') nNew++;
+      else if(cd.status==='learning') nLearning++;
+      else nKnown++;
+      if(cd.due <= now) nDue++;
+    });
+    return {new:nNew, learning:nLearning, known:nKnown, due:nDue, total:all.length};
+  }
+
+  function getPoProgress(){
+    // Per position progress
+    const all = buildAllCards();
+    const byPos = {};
+    all.forEach(c => {
+      const key = `${c.phase}__${c.posKey}`;
+      if(!byPos[key]) byPos[key] = {name:c.posName, phase:c.phase, total:0, known:0, learning:0, new:0};
+      byPos[key].total++;
+      const cd = getCard(c.id);
+      byPos[key][cd.status]++;
+    });
+    return byPos;
+  }
+
+  function init(){ load(); }
+  function resetAll(){ cards={}; save(); }
+
+  return {init, answer, getDue, getStats, getPoProgress, getCard, buildAllCards, resetAll};
+})();
+
+/* ── Learn Tab Renderer ── */
+let learnState = { current: null, answered: false };
+
+function renderLearnTab(){
+  const stats = SR.getStats();
+  document.getElementById('stat-new').textContent = stats.new;
+  document.getElementById('stat-learning').textContent = stats.learning;
+  document.getElementById('stat-known').textContent = stats.known;
+
+  const due = SR.getDue();
+  const wrap = document.getElementById('learn-card-wrap');
+
+  if(due.length === 0){
+    wrap.innerHTML = `<div class="learn-done">
+      <div class="learn-done-icon">🎉</div>
+      <div class="learn-done-title">Alles gelernt für jetzt!</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:1.5rem">
+        ${stats.known} von ${stats.total} Fragen bekannt. Nächste Wiederholung kommt bald.
+      </div>
+      <button class="learn-btn secondary" onclick="SR.resetAll();renderLearnTab()">Von vorne anfangen</button>
+    </div>`;
+  } else {
+    learnState.current = due[0];
+    learnState.answered = false;
+    renderLearnCard(learnState.current, false, null);
+  }
+
+  // Progress grid
+  const progData = SR.getPoProgress();
+  const grid = document.getElementById('progress-grid');
+  const phaseColors = {offense:'#C83803', defense:'#D83A3A', special:'#F0A500'};
+  grid.innerHTML = Object.entries(progData).map(([key, p]) => {
+    const pct = p.total ? Math.round((p.known/p.total)*100) : 0;
+    const col = phaseColors[p.phase] || '#888';
+    return `<div class="prog-card">
+      <div class="prog-card-title">${p.name}</div>
+      <div class="prog-nums">
+        <span><span class="status-dot status-new" style="display:inline-block"></span>${p.new}</span>
+        <span><span class="status-dot status-learning" style="display:inline-block"></span>${p.learning}</span>
+        <span><span class="status-dot status-known" style="display:inline-block"></span>${p.known}</span>
+      </div>
+      <div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderLearnCard(card, answered, chosenOi){
+  const letters = ['A','B','C','D'];
+  const wrap = document.getElementById('learn-card-wrap');
+  const phaseLabel = {offense:'Offense',defense:'Defense',special:'Special Teams'}[card.phase]||'';
+  const cd = SR.getCard(card.id);
+  const statusLabel = cd.status==='new'?'Neu':cd.status==='known'?'Gelernt':'Lernen';
+  const statusCls = cd.status==='new'?'status-new':cd.status==='known'?'status-known':'status-learning';
+
+  const optsHtml = card.opts.map((opt,oi) => {
+    let cls = 'learn-opt';
+    if(answered){
+      if(oi===chosenOi && oi===card.correct) cls+=' correct';
+      else if(oi===chosenOi && oi!==card.correct) cls+=' wrong';
+      else if(oi===card.correct) cls+=' reveal';
+    }
+    return `<button class="${cls}" onclick="learnAnswer(${oi})" ${answered?'disabled':''}>
+      <span class="learn-opt-l">${letters[oi]}</span><span>${opt}</span>
+    </button>`;
+  }).join('');
+
+  const feedbackHtml = answered ? `<div class="learn-feedback">
+    ${chosenOi===card.correct ? '✓ Richtig!' : '✗ Falsch.'} ${card.tip}
+  </div>` : '';
+
+  const actionsHtml = answered ? `<div class="learn-actions">
+    <button class="learn-btn primary" onclick="renderLearnTab()">Nächste Frage →</button>
+    <button class="learn-btn secondary" onclick="setTab('pos');selPhase('${card.phase}');setTimeout(()=>selPos('${card.group}','${card.posKey}'),100)">Position ansehen</button>
+  </div>` : '';
+
+  const due = SR.getDue();
+
+  wrap.innerHTML = `<div class="learn-card">
+    <div class="learn-card-head">
+      <span class="learn-card-pos">${phaseLabel} › ${card.posName}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--text3)">${due.length} fällig</span>
+        <span class="status-dot ${statusCls}" style="display:inline-block"></span>
+        <span style="font-size:11px;color:var(--text3)">${statusLabel}</span>
+      </div>
+    </div>
+    <div class="learn-card-body">
+      <div class="learn-q">${card.q}</div>
+      <div class="learn-opts">${optsHtml}</div>
+      ${feedbackHtml}
+      ${actionsHtml}
+    </div>
+  </div>`;
+}
+
+function learnAnswer(oi){
+  if(learnState.answered) return;
+  learnState.answered = true;
+  const card = learnState.current;
+  const correct = oi === card.correct;
+  SR.answer(card.id, correct);
+  renderLearnCard(card, true, oi);
+}
+
+/* ════════════════════════════════════════
+   MATCHUP ENGINE
+════════════════════════════════════════ */
+
+const MATCHUP_DATA = {
+  // offense packages: {name, wrCount, teCount, rbCount, passHeavy, runHeavy}
+  packages: {
+    "11": {name:"11 Personnel", wr:3, te:1, rb:1, passHeavy:true,  runHeavy:false},
+    "12": {name:"12 Personnel", wr:2, te:2, rb:1, passHeavy:false, runHeavy:true},
+    "21": {name:"21 Personnel", wr:2, te:1, rb:2, passHeavy:false, runHeavy:true},
+    "22": {name:"22 Personnel", wr:1, te:2, rb:2, passHeavy:false, runHeavy:true},
+    "10": {name:"10 Personnel", wr:4, te:0, rb:1, passHeavy:true,  runHeavy:false},
+  },
+  formations: {
+    "shotgun":     {name:"Shotgun",       passBonus:true,  runMalus:false, noTE:false},
+    "i-formation": {name:"I-Formation",   passBonus:false, runMalus:false, runBonus:true},
+    "pistol":      {name:"Pistol",        passBonus:false, runMalus:false, balanced:true},
+    "empty":       {name:"Empty Backfield",passBonus:true, runMalus:true,  noRB:true},
+  },
+  fronts: {
+    "4-3":   {name:"4-3 Defense",  rushers:4, lbs:3, dbs:4, runStop:"stark",   passRush:"gut"},
+    "3-4":   {name:"3-4 Defense",  rushers:3, lbs:4, dbs:4, runStop:"mittel",  passRush:"flexibel"},
+    "3-3-5": {name:"3-3-5 Nickel", rushers:3, lbs:3, dbs:5, runStop:"schwach", passRush:"mittel"},
+  },
+  coverages: {
+    "cover0": {name:"Cover 0",          manCov:true,  safeties:0, deepZones:0, pressure:"extrem", weakness:"deep pass wenn Blitz geblockt"},
+    "cover1": {name:"Cover 1 (Man Free)",manCov:true, safeties:1, deepZones:1, pressure:"hoch",   weakness:"seam routes, TE durch die Mitte"},
+    "cover2": {name:"Cover 2",          manCov:false, safeties:2, deepZones:2, pressure:"normal", weakness:"seam route, corner route"},
+    "cover3": {name:"Cover 3",          manCov:false, safeties:1, deepZones:3, pressure:"normal", weakness:"flat routes, bubble screens"},
+    "cover4": {name:"Cover 4 (Quarters)",manCov:false,safeties:2, deepZones:4, pressure:"niedrig",weakness:"intermediate crossing routes (10-15 Yards)"},
+    "cover6": {name:"Cover 6",          manCov:false, safeties:2, deepZones:3, pressure:"normal", weakness:"asymmetrische Route-Konzepte"},
+  }
+};
+
+function analyzeMatchup(pkg, form, front, cov){
+  const p = MATCHUP_DATA.packages[pkg];
+  const f = MATCHUP_DATA.formations[form];
+  const fr = MATCHUP_DATA.fronts[front];
+  const cv = MATCHUP_DATA.coverages[cov];
+
+  let offAdvantages = [], defAdvantages = [], tips = [], keyPlay = '';
+  let score = 0; // positive = offense wins
+
+  // ── Package vs Front ──
+  if(p.wr >= 3 && fr.dbs < 5){
+    offAdvantages.push(`${p.wr} Wide Receiver gegen nur ${fr.dbs} Defensive Backs. Mindestens ein WR läuft gegen einen Linebacker.`);
+    score += 2;
+  }
+  if(p.wr >= 3 && fr.dbs >= 5){
+    defAdvantages.push(`Nickel-Aufstellung mit ${fr.dbs} Defensive Backs deckt alle ${p.wr} Wide Receiver.`);
+    score -= 1;
+  }
+  if(p.runHeavy && fr.runStop === 'schwach'){
+    offAdvantages.push(`${p.name} ist Run-orientiert – die ${fr.name} mit nur 3 DL kann das kaum stoppen.`);
+    score += 2;
+  }
+  if(p.runHeavy && fr.runStop === 'stark'){
+    defAdvantages.push(`${fr.name} hat 4 Defensive Linemen. Das ${p.name} Package wird im Run Game unter Druck gesetzt.`);
+    score -= 2;
+  }
+  if(p.te >= 2 && cv.manCov){
+    offAdvantages.push(`${p.te} Tight Ends gegen Man Coverage: TEs sind zu groß für Cornerbacks und zu schnell für Linebackers.`);
+    score += 2;
+  }
+
+  // ── Formation vs Coverage ──
+  if(f.passBonus && cv.safeties >= 2){
+    defAdvantages.push(`${cv.name} mit ${cv.safeties} Safeties macht tiefe Pässe aus dem ${f.name} schwer.`);
+    score -= 1;
+  }
+  if(f.passBonus && cv.pressure === 'extrem'){
+    defAdvantages.push(`${cv.name} erzeugt extremen Druck – der QB hat kaum Zeit auch aus dem ${f.name} heraus.`);
+    score -= 2;
+  }
+  if(f.passBonus && cv.pressure === 'niedrig'){
+    offAdvantages.push(`${cv.name} bringt wenig Druck. Aus dem ${f.name} hat der QB viel Zeit.`);
+    score += 1;
+  }
+  if(f.runBonus && fr.runStop === 'stark'){
+    defAdvantages.push(`I-Formation trifft auf eine ${fr.runStop}e Run-Defense. Kein einfacher Laufweg.`);
+    score -= 1;
+  }
+  if(f.runBonus && fr.runStop !== 'stark'){
+    offAdvantages.push(`I-Formation Run Power gegen eine ${fr.runStop}e Run-Defense. Das Laufspiel hat Raum.`);
+    score += 1;
+  }
+  if(f.noRB && cv.pressure === 'extrem'){
+    defAdvantages.push(`Empty Backfield ohne Running Back: kein Blitz-Stopper. Cover 0 Blitz wird kaum geblockt.`);
+    score -= 3;
+  }
+  if(f.noRB && cv.pressure !== 'extrem'){
+    offAdvantages.push(`Empty Backfield mit 5 Receivern zwingt die ${cv.name} Defense in ihre schwersten Matchups.`);
+    score += 2;
+  }
+
+  // ── Coverage Weakness → Key Play ──
+  keyPlay = `Schwäche der ${cv.name}: ${cv.weakness}. Genau das sollte die Offense hier angreifen.`;
+  tips.push(keyPlay);
+
+  // ── Coordinator Tip ──
+  if(p.passHeavy && cv.manCov && fr.dbs < 5){
+    tips.push(`Coordinator-Tipp: ${p.wr} WRs in Man Coverage ohne genug DBs. Isolation-Routes (Go, Slant) ausnutzen.`);
+  } else if(p.runHeavy && !cv.manCov && fr.runStop !== 'stark'){
+    tips.push(`Coordinator-Tipp: Zone Coverage schützt nicht besonders gut gegen den Run. Power-Laufspiel einsetzen.`);
+  } else if(cv.pressure === 'extrem'){
+    tips.push(`Coordinator-Tipp: Quick Game einsetzen. Slants, Screens, kurze Crossing Routes. Sofort weg mit dem Ball.`);
+  } else {
+    tips.push(`Coordinator-Tipp: ${cv.weakness} gezielt anspielen. Timing-Pässe und Route-Kombinationen gegen diese Coverage.`);
+  }
+
+  // ── Verdict ──
+  let verdict, verdictCls;
+  if(score >= 3){ verdict = 'Klarer Vorteil Offense'; verdictCls = 'verdict-off'; }
+  else if(score <= -3){ verdict = 'Klarer Vorteil Defense'; verdictCls = 'verdict-def'; }
+  else if(score > 0){ verdict = 'Leichter Vorteil Offense'; verdictCls = 'verdict-off'; }
+  else if(score < 0){ verdict = 'Leichter Vorteil Defense'; verdictCls = 'verdict-def'; }
+  else { verdict = 'Ausgeglichen'; verdictCls = 'verdict-even'; }
+
+  return {offAdvantages, defAdvantages, tips, verdict, verdictCls, score};
+}
+
+function renderMatchup(){
+  const pkg  = document.getElementById('m-personnel').value;
+  const form = document.getElementById('m-formation').value;
+  const front= document.getElementById('m-front').value;
+  const cov  = document.getElementById('m-coverage').value;
+
+  renderMatchupField(pkg, form, front, cov);
+
+  const {offAdvantages, defAdvantages, tips, verdict, verdictCls} = analyzeMatchup(pkg, form, front, cov);
+
+  const body = document.getElementById('matchup-analysis-body');
+  let html = '<div class="analysis-row">';
+  html += `<div class="analysis-box adv"><div class="analysis-box-title">✓ Vorteile Offense</div>${
+    offAdvantages.length ? offAdvantages.map(a=>`<div style="margin-bottom:5px">• ${a}</div>`).join('') : '<div style="opacity:.6">Keine klaren Vorteile in diesem Matchup.</div>'
+  }</div>`;
+  html += `<div class="analysis-box dis"><div class="analysis-box-title">✓ Vorteile Defense</div>${
+    defAdvantages.length ? defAdvantages.map(a=>`<div style="margin-bottom:5px">• ${a}</div>`).join('') : '<div style="opacity:.6">Keine klaren Vorteile in diesem Matchup.</div>'
+  }</div>`;
+  html += '</div><div class="analysis-row">';
+  html += `<div class="analysis-box key"><div class="analysis-box-title">🎯 Key Play</div>${tips[0]||''}</div>`;
+  html += `<div class="analysis-box tip"><div class="analysis-box-title">💡 Coordinator-Tipp</div>${tips[1]||tips[0]||''}</div>`;
+  html += '</div>';
+  body.innerHTML = html;
+
+  document.getElementById('matchup-verdict').innerHTML =
+    `<span class="verdict-badge ${verdictCls}">${verdict}</span>`;
+}
+
+function renderMatchupField(pkg, form, front, cov){
+  const svg = document.getElementById('matchup-svg');
+  const W=560,H=300,FX=10,FY=10,FW=W-20,FH=H-20;
+  const scrimY = FY + FH * 0.54;
+
+  let s = `<defs><marker id="arm" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round"/></marker></defs>`;
+  s += `<rect x="${FX}" y="${FY}" width="${FW}" height="${FH}" rx="5" fill="#0D3320"/>`;
+  s += `<rect x="${FX}" y="${FY}" width="${FW}" height="${FH}" rx="5" fill="none" stroke="rgba(255,255,255,.06)" stroke-width=".5"/>`;
+  for(let i=1;i<5;i++){const lx=FX+FW*i/5;s+=`<line x1="${lx}" y1="${FY}" x2="${lx}" y2="${FY+FH}" stroke="rgba(255,255,255,.05)" stroke-width=".5"/>`;}
+  s += `<rect x="${FX}" y="${FY}" width="${FW}" height="${FH*.09}" rx="4" fill="#1D9E75" opacity=".18"/>`;
+  s += `<line x1="${FX}" y1="${scrimY}" x2="${FX+FW}" y2="${scrimY}" stroke="#F0A500" stroke-width="1.5" stroke-dasharray="6 4" opacity=".6"/>`;
+  s += `<text x="${FX+4}" y="${scrimY-4}" font-size="9" fill="#F0A500" font-family="system-ui" font-weight="700" opacity=".8">LoS</text>`;
+
+  const pData = MATCHUP_DATA.packages[pkg];
+  const fData = MATCHUP_DATA.fronts[front];
+  const cvData = MATCHUP_DATA.coverages[cov];
+
+  // ── OFFENSE players (below LoS) ──
+  const offY = scrimY + FH*0.08;
+  // O-Line always 5
+  const olX = [.30,.38,.46,.54,.62];
+  olX.forEach((x,i) => {
+    const cx=FX+x*FW;
+    s+=`<circle cx="${cx}" cy="${offY}" r="9" fill="#C83803" opacity=".85" stroke="#8C2800" stroke-width=".8"/>`;
+    s+=`<text x="${cx}" y="${offY+3.5}" text-anchor="middle" font-size="8" font-weight="700" fill="#fff" font-family="system-ui">${['LT','LG','C','RG','RT'][i]}</text>`;
+  });
+  // TE(s)
+  for(let i=0;i<pData.te;i++){
+    const cx=FX+(i===0?.70:.22)*FW;
+    s+=`<circle cx="${cx}" cy="${offY}" r="9" fill="#5DCAA5" opacity=".85" stroke="#3A8A7A" stroke-width=".8"/>`;
+    s+=`<text x="${cx}" y="${offY+3.5}" text-anchor="middle" font-size="8" font-weight="700" fill="#fff" font-family="system-ui">TE</text>`;
+  }
+  // WR(s)
+  const wrPositions = pData.wr===1?[.84]:pData.wr===2?[.10,.84]:pData.wr===3?[.10,.22,.84]:pData.wr===4?[.08,.20,.78,.90]:[];
+  wrPositions.forEach(x => {
+    const cx=FX+x*FW, wrY=offY-FH*.04;
+    s+=`<circle cx="${cx}" cy="${wrY}" r="9" fill="#C83803" opacity=".7" stroke="#8C2800" stroke-width=".8"/>`;
+    s+=`<text x="${cx}" y="${wrY+3.5}" text-anchor="middle" font-size="8" font-weight="700" fill="#fff" font-family="system-ui">WR</text>`;
+  });
+  // QB + RB positions depend on formation
+  const qbY = form==='shotgun'||form==='pistol'?scrimY+FH*.22:scrimY+FH*.12;
+  const qbX = FX+.46*FW;
+  s+=`<circle cx="${qbX}" cy="${qbY}" r="10" fill="#F0A500" opacity=".95" stroke="#A07000" stroke-width="1"/>`;
+  s+=`<text x="${qbX}" y="${qbY+3.5}" text-anchor="middle" font-size="8" font-weight="800" fill="#fff" font-family="system-ui">QB</text>`;
+  if(form==='shotgun'||form==='pistol'){
+    s+=`<line x1="${FX+.46*FW}" y1="${offY+3}" x2="${qbX}" y2="${qbY-3}" stroke="#F0A500" stroke-width="1.5" stroke-dasharray="4 3" opacity=".5" marker-end="url(#arm)"/>`;
+  }
+  if(!form.includes('empty')){
+    for(let i=0;i<pData.rb;i++){
+      const rbX=qbX+(i===1?-20:0), rbY=qbY+FH*(form==='i-formation'?.12:.10);
+      s+=`<circle cx="${rbX}" cy="${rbY}" r="8" fill="#C83803" opacity=".75" stroke="#8C2800" stroke-width=".8"/>`;
+      s+=`<text x="${rbX}" y="${rbY+3}" text-anchor="middle" font-size="7" font-weight="700" fill="#fff" font-family="system-ui">${i===0?'RB':'FB'}</text>`;
+    }
+  }
+
+  // ── DEFENSE players (above LoS) ──
+  const dlY = scrimY - FH*.09;
+  const lbY = scrimY - FH*.22;
+  const dbY = scrimY - FH*.40;
+  const deepY = scrimY - FH*.60;
+
+  // DL
+  const dlCount = front==='4-3'||front==='3-3-5'?4:3;
+  const dlPositions = dlCount===4?[.28,.40,.54,.66]:[.32,.46,.60];
+  dlPositions.forEach((x,i) => {
+    const cx=FX+x*FW;
+    const lbl = dlCount===4?(i===0||i===3?'DE':'DT'):(i===1?'NT':'DE');
+    s+=`<circle cx="${cx}" cy="${dlY}" r="9" fill="#D83A3A" opacity=".85" stroke="#993030" stroke-width=".8"/>`;
+    s+=`<text x="${cx}" y="${dlY+3.5}" text-anchor="middle" font-size="8" font-weight="700" fill="#fff" font-family="system-ui">${lbl}</text>`;
+  });
+
+  // LBs
+  const lbCount = front==='3-4'?4:3;
+  const lbPos = lbCount===4?[.22,.38,.58,.74]:[.24,.46,.70];
+  lbPos.forEach((x,i) => {
+    const cx=FX+x*FW;
+    const lbl = lbCount===4?(i===0||i===3?'OLB':'ILB'):(i===1?'MLB':'OLB');
+    s+=`<circle cx="${cx}" cy="${lbY}" r="8" fill="#E8933A" opacity=".85" stroke="#A06020" stroke-width=".8"/>`;
+    s+=`<text x="${cx}" y="${lbY+3.5}" text-anchor="middle" font-size="7" font-weight="700" fill="#fff" font-family="system-ui">${lbl}</text>`;
+  });
+
+  // CBs – one per WR, draw matchup lines
+  const cbX = wrPositions;
+  cbX.forEach((x,i) => {
+    const cx=FX+x*FW, wrY2=offY-FH*.04;
+    s+=`<circle cx="${cx}" cy="${dbY}" r="9" fill="#9B59B6" opacity=".85" stroke="#6A3A8A" stroke-width=".8"/>`;
+    s+=`<text x="${cx}" y="${dbY+3.5}" text-anchor="middle" font-size="8" font-weight="700" fill="#fff" font-family="system-ui">CB</text>`;
+    // Man coverage line
+    if(cvData.manCov){
+      s+=`<line x1="${cx}" y1="${dbY+6}" x2="${cx}" y2="${wrY2-6}" stroke="#9B59B6" stroke-width="1.5" stroke-dasharray="4 3" opacity=".5"/>`;
+    }
+  });
+
+  // Safeties
+  const safeties = cvData.safeties;
+  if(safeties>=1){
+    const fsX = FX+FW*(safeties===2?.32:.46);
+    s+=`<circle cx="${fsX}" cy="${deepY}" r="9" fill="#9B59B6" opacity=".85" stroke="#6A3A8A" stroke-width=".8"/>`;
+    s+=`<text x="${fsX}" y="${deepY+3.5}" text-anchor="middle" font-size="8" font-weight="700" fill="#fff" font-family="system-ui">FS</text>`;
+  }
+  if(safeties>=2){
+    const ssX = FX+FW*.66;
+    s+=`<circle cx="${ssX}" cy="${deepY}" r="9" fill="#9B59B6" opacity=".85" stroke="#6A3A8A" stroke-width=".8"/>`;
+    s+=`<text x="${ssX}" y="${deepY+3.5}" text-anchor="middle" font-size="8" font-weight="700" fill="#fff" font-family="system-ui">SS</text>`;
+    // Cover 2 zone lines
+    s+=`<line x1="${FX+FW*.50}" y1="${FY+4}" x2="${FX+FW*.50}" y2="${scrimY-4}" stroke="#9B59B6" stroke-width="1" stroke-dasharray="3 4" opacity=".25"/>`;
+  }
+  if(safeties===0){
+    // Blitz arrow from where safety would be
+    const blX=FX+FW*.46, blY=scrimY-FH*.28;
+    s+=`<line x1="${blX}" y1="${blY}" x2="${qbX}" y2="${qbY-5}" stroke="#D83A3A" stroke-width="2" marker-end="url(#arm)" opacity=".7"/>`;
+    s+=`<text x="${blX-5}" y="${blY-5}" font-size="8" fill="#D83A3A" font-family="system-ui" font-weight="700">Blitz!</text>`;
+  }
+
+  svg.innerHTML = s;
+}
+
+function randomMatchup(){
+  const pkgs = Object.keys(MATCHUP_DATA.packages);
+  const forms = Object.keys(MATCHUP_DATA.formations);
+  const fronts = Object.keys(MATCHUP_DATA.fronts);
+  const covs = Object.keys(MATCHUP_DATA.coverages);
+  document.getElementById('m-personnel').value = pkgs[Math.floor(Math.random()*pkgs.length)];
+  document.getElementById('m-formation').value = forms[Math.floor(Math.random()*forms.length)];
+  document.getElementById('m-front').value = fronts[Math.floor(Math.random()*fronts.length)];
+  document.getElementById('m-coverage').value = covs[Math.floor(Math.random()*covs.length)];
+  renderMatchup();
+}
+
 /* init */
 showPosScreen('phase');showSchScreen('phase');
-document.getElementById('tab-glo').style.display='none';
+['tab-glo','tab-learn','tab-matchup'].forEach(id=>document.getElementById(id).style.display='none');
+SR.init();
 </script>
 </body>
 </html>
