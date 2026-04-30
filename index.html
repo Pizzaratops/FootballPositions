@@ -853,7 +853,7 @@ function renderPosDetail(){
   document.getElementById('bc-pos').textContent=pos.name;
   document.getElementById('pos-title').textContent=pos.name;
   document.getElementById('pos-tagline').textContent=pos.tagline;
-  const b=document.getElementById('pos-badge');b.textContent=pos.abbr;b.className='pos-badge'+(isOff?'':' def');
+  const b=document.getElementById('pos-badge');b.textContent=pos.abbr;b.className='pos-badge'+(PS.phase==='special'?' sch':isOff?'':' def');
   document.getElementById('task-list').innerHTML=pos.tasks.map((t,i)=>`<li class="task-item"><span class="task-n">${i+1}</span><span>${t}</span></li>`).join('');
   document.getElementById('leg-sel').style.background=PS.phase==='special'?'#F0A500':isOff?'#C83803':'#D83A3A';
   renderPosField();renderPosExamples();renderPosQuiz();
@@ -1389,7 +1389,7 @@ function renderPosOverview(){
   players.forEach(p => {
     const cx = FX + p.x * FW;
     const cy = FY + p.y * FH;
-    const isMain = isST ? p.team === 'st' : p.team === (isOff ? 'off' : 'def'); const isOpp = !isMain;
+    const isMain = isST ? p.team === 'st' : p.team === (isOff ? 'off' : 'def');
     const isOpp  = !isMain;
     const r = isMain ? 14 : 10;
 
