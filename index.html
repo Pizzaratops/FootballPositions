@@ -137,6 +137,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 .nav-btn:hover:not(:disabled){border-color:var(--border2);color:var(--text)}
 .nav-btn:disabled{opacity:.3;cursor:default}
 .nav-mid{font-size:12px;color:var(--text3)}
+
+/* ── Glossary tooltip ── */
+.gterm{border-bottom:1.5px dotted var(--bi);cursor:help;color:inherit;font-weight:inherit}
+.gterm:hover{color:var(--text-info)}
+.gbox{display:none;margin-top:6px;padding:8px 12px;background:var(--bg-info);border:.5px solid var(--bi);border-radius:var(--r);font-size:12px;color:var(--text-info);line-height:1.55}
+.gbox.open{display:block}
+.gbox-title{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;opacity:.75}
+
+/* ── Player examples ── */
+.example-sec{padding:.9rem 1.2rem;border-top:.5px solid var(--border)}
+.example-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:.6rem}
+.example-card{padding:.6rem .85rem;border-radius:var(--r);border:.5px solid var(--border);background:var(--bg2);font-size:12px;line-height:1.5}
+.example-name{font-weight:600;font-size:13px;color:var(--text);margin-bottom:2px}
+.example-team{font-size:11px;color:var(--text3)}
+.example-why{font-size:12px;color:var(--text2);margin-top:3px}
+
+/* ── Glossar tab ── */
+.glossar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:1rem}
+.glossar-card{padding:.85rem 1rem;border-radius:var(--r);border:.5px solid var(--border);background:var(--bg)}
+.glossar-term{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.glossar-def{font-size:13px;color:var(--text2);line-height:1.5}
+.glossar-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.gfbtn{padding:4px 12px;border-radius:999px;border:.5px solid var(--border);background:var(--bg);font-size:12px;cursor:pointer;color:var(--text2);font-family:inherit;transition:all .1s}
+.gfbtn:hover{border-color:var(--border2);color:var(--text)}
+.gfbtn.active{background:var(--bg-info);color:var(--text-info);border-color:var(--bi)}
 </style>
 </head>
 <body>
@@ -149,6 +174,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
   <div class="top-nav">
     <button class="tnav active" id="tnav-pos" onclick="setTab('pos')">Positionen</button>
     <button class="tnav" id="tnav-sch" onclick="setTab('sch')">Schemes &amp; Formations</button>
+    <button class="tnav" id="tnav-glo" onclick="setTab('glo')">Glossar</button>
   </div>
 
   <!-- ══════════════════ TAB: POSITIONEN ══════════════════ -->
@@ -196,6 +222,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
             <ul class="task-list" id="task-list"></ul>
           </div>
         </div>
+      </div>
+      <div class="info-panel" style="margin-bottom:14px">
+        <div class="example-sec"><div class="lbl">Bekannte Spieler</div><div class="example-grid" id="pos-examples"></div></div>
       </div>
       <div class="quiz-panel">
         <div class="quiz-head"><span class="quiz-title">Quiz</span><span class="quiz-score" id="pos-quiz-score"></span></div>
@@ -260,6 +289,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
       </div>
     </div>
   </div>
+  <!-- ══════════════════ TAB: GLOSSAR ══════════════════ -->
+  <div id="tab-glo" style="display:none">
+    <div class="lbl" style="margin-bottom:.5rem">Football-Begriffe von A–Z</div>
+    <div class="glossar-filter" id="glo-filter"></div>
+    <div class="glossar-grid" id="glo-grid"></div>
+  </div>
+
 </div>
 
 <script>
@@ -619,10 +655,11 @@ let SS2={phase:null,group:null,schKey:null}; // schemes
 let ANS={}; // quiz answers
 
 function setTab(t){
-  document.getElementById('tab-pos').style.display=t==='pos'?'block':'none';
-  document.getElementById('tab-sch').style.display=t==='sch'?'block':'none';
-  document.getElementById('tnav-pos').className='tnav'+(t==='pos'?' active':'');
-  document.getElementById('tnav-sch').className='tnav'+(t==='sch'?' active':'');
+  ['pos','sch','glo'].forEach(n=>{
+    document.getElementById('tab-'+n).style.display=n===t?'block':'none';
+    document.getElementById('tnav-'+n).className='tnav'+(n===t?' active':'');
+  });
+  if(t==='glo') renderGlossar();
 }
 
 /* ════════════════════════════════════════
@@ -655,7 +692,7 @@ function renderPosDetail(){
   const b=document.getElementById('pos-badge');b.textContent=pos.abbr;b.className='pos-badge'+(isOff?'':' def');
   document.getElementById('task-list').innerHTML=pos.tasks.map((t,i)=>`<li class="task-item"><span class="task-n">${i+1}</span><span>${t}</span></li>`).join('');
   document.getElementById('leg-sel').style.background=isOff?'#378ADD':'#D85A30';
-  renderPosField();renderPosQuiz();
+  renderPosField();renderPosExamples();renderPosQuiz();
   const all=allPosFlat(PS.phase),idx=posCurIdx();
   document.getElementById('btn-prev').disabled=idx<=0;
   document.getElementById('btn-next').disabled=idx>=all.length-1;
@@ -684,10 +721,187 @@ function renderPosField(){
   document.getElementById('pos-field-note').textContent=POS_DATA[PS.phase].groups[PS.group].positions[PS.posKey].tagline;
 }
 
+function renderPosExamples(){
+  const ex=PLAYER_EXAMPLES[PS.posKey]||[];
+  document.getElementById('pos-examples').innerHTML=ex.length?ex.map(p=>
+    `<div class="example-card"><div class="example-name">${p.name}</div><div class="example-team">${p.team}</div><div class="example-why">${p.why}</div></div>`
+  ).join(''):`<div style="font-size:13px;color:var(--text3)">Keine Beispiele hinterlegt.</div>`;
+}
+
 function renderPosQuiz(){
   const pos=POS_DATA[PS.phase].groups[PS.group].positions[PS.posKey];
   renderQuiz(pos.quiz,`pos_${PS.phase}_${PS.posKey}`,'pos-quiz-score','pos-quiz-body');
 }
+
+/* ════════════════════════════════════════
+   PLAYER EXAMPLES
+════════════════════════════════════════ */
+const PLAYER_EXAMPLES={
+  QB:[
+    {name:"Patrick Mahomes",team:"Kansas City Chiefs",why:"Drei-mal Super Bowl Champion – bekannt für Off-Platform-Würfe und improvisierten Play-Making unter Druck."},
+    {name:"Lamar Jackson",team:"Baltimore Ravens",why:"2× NFL MVP – dual-threat QB, dominiert als Runner und Passer zugleich. Höchste Yards-per-Attempt aller aktiven QBs."},
+    {name:"Josh Allen",team:"Buffalo Bills",why:"Einer der physischsten QBs der NFL – kombiniert Elite-Arm-Talent mit Rushing-Fähigkeiten und übernimmt Spiele."},
+    {name:"Joe Burrow",team:"Cincinnati Bengals",why:"Bekannt für präzises Timing, schnelle Release und ruhiges Auftreten unter Blitz-Druck."}
+  ],
+  RB:[
+    {name:"Saquon Barkley",team:"Philadelphia Eagles",why:"Super Bowl Champion 2025 – elite Combination Runner mit 2.000+ Rushing Yards in 2024. Gap Reading auf höchstem Niveau."},
+    {name:"Derrick Henry",team:"Baltimore Ravens",why:"Bruiser-Back: physisch nicht zu stoppen im Short Yardage. Über 30 Jahre alt mit 93.1 PFF Rushing Grade in 2024."},
+    {name:"Breece Hall",team:"New York Jets",why:"Moderner All-Purpose RB – stark als Runner und als Receiver aus dem Backfield."}
+  ],
+  FB:[
+    {name:"Kyle Juszczyk",team:"San Francisco 49ers",why:"Der bekannteste aktive Fullback der NFL – nicht nur Lead Blocker, sondern auch Receiving-Option. Sechs Pro Bowls."}
+  ],
+  WR:[
+    {name:"Ja'Marr Chase",team:"Cincinnati Bengals",why:"Triple Crown 2024: meiste Catches, meiste Yards, meiste TDs. Explosive Route-Running und Separation auf jedem Level."},
+    {name:"Justin Jefferson",team:"Minnesota Vikings",why:"Bekannt für seinen einzigartigen 'Griddy'-Catch-Style und Elite-Route-Running. Einer der besten YAC-Receiver der NFL."},
+    {name:"Tyreek Hill",team:"Miami Dolphins",why:"'Cheetah' – einer der schnellsten WRs aller Zeiten. Separation durch pure Geschwindigkeit und präzise Release."},
+    {name:"Rome Odunze",team:"Chicago Bears",why:"Slot WR – läuft viele Routen aus dem Slot, nutzt Größe und Athletik gegen Linebackers in Man Coverage."}
+  ],
+  TE:[
+    {name:"Brock Bowers",team:"Las Vegas Raiders",why:"Bester Rookie TE seit Jahren – 85.1 PFF Grade als Rookie. Fängt wie ein WR, blockt wie ein Lineman."},
+    {name:"Sam LaPorta",team:"Detroit Lions",why:"Moderner Receiving TE – nutzt Athletik und Route-Running um Safeties und Linebackers zu überwinden."},
+    {name:"George Kittle",team:"San Francisco 49ers",why:"Der kompletteste TE der NFL: elite Block-TE und gefährlicher Receiver. Bekannt für spektakuläre YAC nach dem Catch."}
+  ],
+  LT:[
+    {name:"Tristan Wirfs",team:"Tampa Bay Buccaneers",why:"Erster Spieler mit First-Team All-Pro als LT und RT. Hat vier Jahre in Folge keinen Sack zugelassen. NFL Protector of the Year Kandidat."},
+    {name:"Garett Bolles",team:"Denver Broncos",why:"Hatte 2025 seine beste Saison – ließ keinen einzigen Sack zu trotz wiederholter 1-on-1-Situationen gegen Elite Edge Rusher."},
+    {name:"Lane Johnson",team:"Philadelphia Eagles",why:"Einer der besten Pass-Blocking-Tackles der letzten Dekade – bekannt für seinen athletischen Kick-Step gegen Speed Rusher."}
+  ],
+  LG:[
+    {name:"Chris Lindstrom",team:"Atlanta Falcons",why:"Höchstes WAR aller Offensive Linemen 2024. Dominant im Run Blocking und zuverlässig im Pass Schutz."},
+    {name:"Joel Bitonio",team:"Cleveland Browns",why:"Langjähriger Veteran – bekannt für Ruhe, Technik und Konsistenz als Guard."}
+  ],
+  C:[
+    {name:"Creed Humphrey",team:"Kansas City Chiefs",why:"Gilt als bester Center der NFL – außergewöhnliche Run-Block-Führerschaft und perfekte Protection-Calls für Mahomes."},
+    {name:"Frank Ragnow",team:"Detroit Lions",why:"Elite Center bekannt für Interior-Dominanz in Kyle Shanahan-ähnlichen Run-Schemes."}
+  ],
+  RG:[
+    {name:"Zack Martin",team:"Dallas Cowboys",why:"Neunmaliger Pro Bowler – einer der konsistentesten Guards in NFL-Geschichte."},
+    {name:"Kevin Zeitler",team:"verschiedene Teams",why:"Veteran-Guard bekannt für Technik und Zuverlässigkeit auf der rechten Seite."}
+  ],
+  RT:[
+    {name:"Penei Sewell",team:"Detroit Lions",why:"Junger Star-Tackle – ausgezeichnet im Run Blocking, solide im Pass Schutz. Gilt als zukünftiger LT."},
+    {name:"Trent Brown",team:"verschiedene Teams",why:"Einer der physischsten RTs der Liga – bekannt für Dominanz in Power-Run-Schemes."}
+  ],
+  DE:[
+    {name:"Myles Garrett",team:"Cleveland Browns",why:"22 Tackles for Loss 2024, 102.5 Karriere-Sacks. Kombiniert Kraft, Geschwindigkeit und Elite-Pass-Rush-Moves."},
+    {name:"Aidan Hutchinson",team:"Detroit Lions",why:"DPOY-Kandidat 2024/25 – explosiver erster Schritt und breites Arsenal an Speed- und Power-Moves."},
+    {name:"Micah Parsons",team:"Dallas Cowboys",why:"Vielseitigster Edge Rusher der NFL – kann als 4-3 DE, 3-4 OLB oder als Linebacker spielen."}
+  ],
+  DT:[
+    {name:"Jalen Carter",team:"Philadelphia Eagles",why:"Dominantester Interior Rusher seiner Generation – explosiver erster Schritt, schwer zu blocken 1-on-1."},
+    {name:"Cameron Heyward",team:"Pittsburgh Steelers",why:"Veteranen-DT mit Hall-of-Fame-Kandidatur – beste Run-Defense an seiner Position und konstanter Pass Rush."},
+    {name:"Daron Payne",team:"Washington Commanders",why:"Elite Nose Tackle – bindet doppelt und macht Linebackers frei."}
+  ],
+  MLB:[
+    {name:"Fred Warner",team:"San Francisco 49ers",why:"Bekannt als bester All-Around Linebacker der NFL – schlägt beim Run, deckt RBs und TEs und ruft alle Anpassungen."},
+    {name:"Lavonte David",team:"Tampa Bay Buccaneers",why:"Veteran-MLB – bekannt für herausragende Tackle-Effizienz und Lese-Fähigkeiten."}
+  ],
+  OLB:[
+    {name:"T.J. Watt",team:"Pittsburgh Steelers",why:"Einer der besten Edge/OLB-Rusher der NFL – außergewöhnliche Technik und Motor."},
+    {name:"Maxx Crosby",team:"Las Vegas Raiders",why:"Nicht zu stoppen: elite Conditioning, breites Rush-Repertoire, konstant über 200 Pressures pro Saison."}
+  ],
+  ILB:[
+    {name:"Carson Schwesinger",team:"Cleveland Browns",why:"Defensive Rookie of the Year 2025 – sofort herausragend als Run-Stopper und in Coverage."},
+    {name:"Zaire Franklin",team:"Indianapolis Colts",why:"Tacklingmaschine – führte die NFL 2023 in Tackles an."}
+  ],
+  CB:[
+    {name:"Patrick Surtain II",team:"Denver Broncos",why:"AP Defensive Player of the Year 2024 – schattiert Elite-WRs und lässt sie auf Combined-Stats von 7 Catches / 75 Yards in 3 Wochen."},
+    {name:"Jaire Alexander",team:"Green Bay Packers",why:"Einer der physischsten CBs – bekannt für aggressive Press Coverage und perfekte Hip-Rotation."},
+    {name:"Sauce Gardner",team:"New York Jets",why:"Herausragende Länge und Athletik – selten gerate er in Trouble in Man Coverage."}
+  ],
+  FS:[
+    {name:"Kyle Hamilton",team:"Baltimore Ravens",why:"90.0 PFF Grade 2024 – elite in Run Defense, Pass Rush und Coverage. Gilt als bester Safety der NFL."},
+    {name:"Talanoa Hufanga",team:"San Francisco 49ers",why:"Instinkt-Safety – liest QBs perfekt und kommt immer zur richtigen Zeit."}
+  ],
+  SS:[
+    {name:"Budda Baker",team:"Arizona Cardinals",why:"Einer der athletischsten Safeties – nahe der Linie effektiv als Run-Stopper und in Slot-Coverage."},
+    {name:"Derwin James",team:"Los Angeles Chargers",why:"Vielseitigster Safety der NFL – kann als SS, FS, als Nickelback und sogar als LB eingesetzt werden."}
+  ],
+  NB:[
+    {name:"Trevon Diggs",team:"Dallas Cowboys",why:"Aggressiver Nickelback – bekannt für spektakuläre Interceptions und Ball-Hawking in Zone Coverage."},
+    {name:"Bryce Hall",team:"verschiedene Teams",why:"Solider Nickelback-Spezialist – deckt Slot Receiver und hilft beim Run."}
+  ]
+};
+
+/* ════════════════════════════════════════
+   GLOSSARY DATA
+════════════════════════════════════════ */
+const GLOSSARY=[
+  {term:"A-Gap",cat:"Formation",def:"Der Spalt direkt links und rechts vom Center. Durch den A-Gap rushes Nose Tackles und Blitzing Linebackers – der direkteste Weg zum QB."},
+  {term:"B-Gap",cat:"Formation",def:"Der Spalt zwischen Center und Guard (links und rechts). Guards sind primär für den B-Gap verantwortlich."},
+  {term:"C-Gap",cat:"Formation",def:"Der Spalt zwischen Guard und Tackle (außen). Tackles und Tight Ends schützen den C-Gap."},
+  {term:"Edge",cat:"Formation",def:"Der äußerste Rand der Defensive Line. Edge Rusher attackieren den Quarterback von dieser Position außen."},
+  {term:"Edge Rusher",cat:"Defense",def:"Verteidiger der den Quarterback von außen (Edge) attackiert. Kann ein Defensive End (4-3) oder Outside Linebacker (3-4) sein. Ziel: Sack oder Hurry des QBs. Beispiele: Myles Garrett, T.J. Watt."},
+  {term:"Speed Rusher",cat:"Defense",def:"Pass Rusher der primär Geschwindigkeit nutzt um den Offensive Tackle zu umgehen. Kontrastiert mit einem 'Bull Rusher' der Kraft einsetzt. Typisch für schlanke, explosive DEs/OLBs."},
+  {term:"Bull Rush",cat:"Defense",def:"Pass-Rush-Move bei dem der Verteidiger den Blocker durch pure Kraft rückwärts auf den QB drückt. Gegensatz zum Speed Move."},
+  {term:"Speed Move",cat:"Defense",def:"Pass-Rush-Technik bei dem der Rusher Geschwindigkeit nutzt um am Blocker vorbeizulaufen. Varianten: Swim Move, Spin Move, Rip Move."},
+  {term:"Swim Move",cat:"Defense",def:"Pass-Rush-Move: Der Rusher hakt den Arm des Blockers ab (wie beim Schwimmen) um innen vorbeizukommen."},
+  {term:"Sack",cat:"Defense",def:"Der Quarterback wird hinter der Line of Scrimmage tackelt während er den Ball noch in der Hand hält. Ergibt Yardverlust."},
+  {term:"Blitz",cat:"Defense",def:"Wenn mehr Verteidiger als die Standard-4 DL den QB rushen. Durch Blitz kommt mehr Druck, aber weniger Coverage hinter der Linie."},
+  {term:"Cover 0",cat:"Coverage",def:"Man Coverage ohne freien Safety. Jeder Receiver wird 1-on-1 gedeckt, alle anderen rushen. Maximaler Druck, maximales Risiko."},
+  {term:"Cover 1",cat:"Coverage",def:"Man Coverage mit einem freien Safety tief (Man Free). CBs decken ihre WRs, FS hilft tief in der Mitte."},
+  {term:"Cover 2",cat:"Coverage",def:"Zwei Safeties teilen das Deep Field links/rechts auf. CBs spielen underneath. Schwach gegen die Seam Route in der Mitte."},
+  {term:"Cover 3",cat:"Coverage",def:"Drei Verteidiger teilen das Deep Field auf: FS in der Mitte, beide CBs außen. 7-Mann-Coverage, stark gegen tiefe Pässe."},
+  {term:"Cover 4",cat:"Coverage",def:"Vier Verteidiger (Quarters) teilen das Deep Field auf. Fast unschlagbar gegen den Deep Ball, aber anfällig Intermediate."},
+  {term:"Cover 6",cat:"Coverage",def:"Hybrid: Cover 4 auf der starken Seite, Cover 2 auf der schwachen Seite. Sehr komplex und täuschend."},
+  {term:"Deep Zone",cat:"Coverage",def:"Der Bereich des Felds ab ca. 15–20 Yards hinter der Line of Scrimmage. Safeties und deep-droppen CBs decken hier."},
+  {term:"Flat Zone",cat:"Coverage",def:"Der kurze Außenbereich direkt hinter der Line of Scrimmage. Oft von Cornerbacks oder außen-Linebackers gedeckt."},
+  {term:"Seam Route",cat:"Offense",def:"Route die vertikal durch den Spalt zwischen CB und Safety (die 'Seam') läuft. Klassische Waffe gegen Cover 2."},
+  {term:"Go Route",cat:"Offense",def:"Die einfachste und tiefste Route: der Receiver läuft geradeaus so schnell und weit er kann. Auch 'Fly Route' genannt."},
+  {term:"Slant Route",cat:"Offense",def:"Kurze Route die diagonal nach innen läuft (etwa 45°) nach einem 2–3-Schritt-Release. Gut gegen Man Coverage."},
+  {term:"Checkdown",cat:"Offense",def:"Die kürzeste und sicherste Pass-Option des QBs, meistens ein RB oder TE im Kurzbereich. Der QB wirft dahin wenn alle anderen Receiver gedeckt sind."},
+  {term:"Handoff",cat:"Offense",def:"Der QB übergibt den Ball direkt an den Running Back ohne ihn zu werfen. Basis jedes Run Plays."},
+  {term:"Pre-Snap Read",cat:"Offense",def:"Die Analyse der Defense-Aufstellung durch den QB vor dem Snap. Erlaubt Anpassungen der Routes und Protection."},
+  {term:"Scramble",cat:"Offense",def:"Der QB läuft selbst mit dem Ball wenn kein Receiver frei ist oder der Pocket kollabiert."},
+  {term:"Pocket",cat:"Offense",def:"Der Bereich hinter der O-Line in dem der QB steht und passiert. Die O-Line hält die Pocket sauber gegen Pass Rusher."},
+  {term:"Line of Scrimmage (LoS)",cat:"Formation",def:"Die imaginäre Linie auf der der Ball liegt und von der aus das Play beginnt. Beide Teams müssen hinter ihrer LoS stehen."},
+  {term:"Snap",cat:"Formation",def:"Der Beginn eines Plays: der Center passt den Ball zum QB (Under Center) oder wirft ihn (Shotgun/Pistol)."},
+  {term:"Under Center",cat:"Formation",def:"QB-Position direkt hinter dem Center, der den Ball direkt übergibt. Alternativ zum Shotgun."},
+  {term:"Shotgun",cat:"Formation",def:"QB steht 5–7 Yards hinter dem Center und bekommt den Ball durch die Luft zugeworfen. Standard im modernen Pass-Football."},
+  {term:"Pistol",cat:"Formation",def:"QB steht 3–4 Yards hinter dem Center – zwischen Under Center und Shotgun. Kombiniert Run-Power mit Pass-Sicht."},
+  {term:"I-Formation",cat:"Formation",def:"QB, Fullback und Running Back stehen in einer Linie hintereinander. Klassische Power-Run-Formation."},
+  {term:"11 Personnel",cat:"Personnel",def:"1 Running Back, 1 Tight End, 3 Wide Receiver. Der moderne NFL-Standard (über 60% aller Snaps)."},
+  {term:"12 Personnel",cat:"Personnel",def:"1 Running Back, 2 Tight Ends, 2 Wide Receiver. Stark im Run Game, gute Pass-Optionen durch die TEs."},
+  {term:"21 Personnel",cat:"Personnel",def:"2 Running Backs (RB + Fullback), 1 Tight End, 2 Wide Receiver. Maximale Run-Power mit Lead Blocker."},
+  {term:"Nickel Defense",cat:"Defense",def:"5 Defensive Backs statt der Standard-4. Der 5. DB (Nickelback) ersetzt einen Linebacker gegen 3-WR-Formationen."},
+  {term:"Dime Defense",cat:"Defense",def:"6 Defensive Backs. Gegen 4-WR-Formationen oder in klaren Pass-Situations (3rd and Long)."},
+  {term:"Slot Receiver",cat:"Offense",def:"Wide Receiver der zwischen dem Tight End und dem außen stehenden WR aufläuft. Oft schneller und wendiger als der Outside WR."},
+  {term:"Man Coverage",cat:"Coverage",def:"Jeder Verteidiger ist einem bestimmten Receiver zugeordnet und folgt ihm überall. Kontrastiert mit Zone Coverage."},
+  {term:"Zone Coverage",cat:"Coverage",def:"Verteidiger decken einen Bereich des Felds, nicht einen bestimmten Spieler. Passen Receiver zwischen Zonen weiter."},
+  {term:"Press Coverage",cat:"Coverage",def:"Cornerback positioniert sich direkt gegenüber dem WR und versucht dessen Release an der Line of Scrimmage zu stören."},
+  {term:"Separation",cat:"Offense",def:"Der Abstand den ein Receiver zwischen sich und seinen deckenden Cornerback schafft. Separation = offener Receiver."},
+  {term:"Route",cat:"Offense",def:"Der vorher festgelegte Laufweg eines Receivers. Präzise choreografiert für exaktes Timing mit dem QB."},
+  {term:"Gap Discipline",cat:"Defense",def:"Defensive Pflicht jedes Spielers, seinen zugewiesenen Gap zu halten und nicht unkontrolliert zu verlassen."},
+  {term:"Second Level",cat:"Formation",def:"Der Bereich hinter der Defensive Line, wo die Linebackers spielen. Runner die die Line of Scrimmage durchbrechen, treffen auf das Second Level."},
+  {term:"Stacked Box",cat:"Defense",def:"Wenn die Defense 7 oder mehr Spieler nahe der Line of Scrimmage platziert, um den Run zu stoppen."},
+  {term:"Lead Blocker",cat:"Offense",def:"Ein Spieler (meistens Fullback) der vor dem eigentlichen Ball-Carrier durch die Lücke läuft und Verteidiger abschirmt."},
+  {term:"Pull Block",cat:"Offense",def:"Ein Guard oder Tackle verlässt seine normale Position und zieht seitlich entlang der Linie um als Lead Blocker zu fungieren."},
+  {term:"Interior Pass Rush",cat:"Defense",def:"Pass Rush durch die Mitte der Linie (A- und B-Gaps) durch DTs und Nose Tackle. Erzwingt QB-Scramble durch Pocket-Kollaps."},
+  {term:"Run Containment",cat:"Defense",def:"Die Pflicht des äußeren Verteidigers (DE oder OLB) den Runner daran zu hindern, außen herumzulaufen."},
+  {term:"YAC",cat:"Offense",def:"Yards After Catch – wie viele Yards ein Receiver nach dem Fangen noch läuft. Elite-Receiver haben hohe YAC-Werte."},
+  {term:"EPA",cat:"Statistik",def:"Expected Points Added – statistische Metrik die misst wie viel ein Play zum Erwartungswert der Punkte beigetragen hat."},
+  {term:"PFF Grade",cat:"Statistik",def:"Pro Football Focus Grade – positionales Bewertungssystem (0–100) das jeden Snap jedes Spielers bewertet."}
+];
+
+let gloFilter='Alle';
+function renderGlossar(){
+  const cats=['Alle',...new Set(GLOSSARY.map(g=>g.cat))];
+  document.getElementById('glo-filter').innerHTML=cats.map(c=>`<button class="gfbtn${gloFilter===c?' active':''}" onclick="setGloFilter('${c}')">${c}</button>`).join('');
+  const items=gloFilter==='Alle'?GLOSSARY:GLOSSARY.filter(g=>g.cat===gloFilter);
+  document.getElementById('glo-grid').innerHTML=items.map(g=>`<div class="glossar-card"><div class="glossar-term">${g.term} <span style="font-size:10px;color:var(--text3);font-weight:400">${g.cat}</span></div><div class="glossar-def">${g.def}</div></div>`).join('');
+}
+function setGloFilter(c){gloFilter=c;renderGlossar();}
+
+/* glossTerm helper: wraps a term in HTML with inline popover */
+function glossTerm(word,key){
+  const entry=GLOSSARY.find(g=>g.term===key||g.term.toLowerCase()===key.toLowerCase());
+  if(!entry)return word;
+  const id='gt_'+key.replace(/\s/g,'_')+Math.random().toString(36).slice(2,6);
+  return `<span class="gterm" onclick="toggleGBox('${id}')">${word}</span><div class="gbox" id="${id}"><div class="gbox-title">${entry.term}</div>${entry.def}</div>`;
+}
+function toggleGBox(id){const el=document.getElementById(id);if(el)el.classList.toggle('open');}
+
 
 /* ════════════════════════════════════════
    SCHEMES LOGIC
@@ -801,6 +1015,23 @@ function getSchQuiz(ph,grp,sk){return SCHEME_QUIZZES[sk]||[]}
 /* ════════════════════════════════════════
    QUIZ ENGINE
 ════════════════════════════════════════ */
+// Auto-link glossary terms found in a text string
+function linkGlossaryTerms(text){
+  // Sort by length descending so longer terms match first
+  const terms=GLOSSARY.map(g=>g.term).sort((a,b)=>b.length-a.length);
+  let result=text;
+  terms.forEach(term=>{
+    const id='gt_'+term.replace(/[\s\-\/]/g,'_')+Math.random().toString(36).slice(2,6);
+    const entry=GLOSSARY.find(g=>g.term===term);
+    if(!entry)return;
+    // Only replace first occurrence, avoid re-wrapping already-wrapped terms
+    const escaped=term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const re=new RegExp(`(?<!class="gterm">)(${escaped})(?!</div>)`,'');
+    result=result.replace(re,(_,m)=>`<span class="gterm" onclick="toggleGBox('${id}')">${m}</span><div class="gbox" id="${id}"><div class="gbox-title">${term}</div>${entry.def}</div>`);
+  });
+  return result;
+}
+
 function renderQuiz(questions,prefix,scoreId,bodyId){
   const ltrs=['A','B','C','D'];
   let ok=0,done=0;
@@ -812,8 +1043,11 @@ function renderQuiz(questions,prefix,scoreId,bodyId){
       let cls='opt';if(rv){if(oi===ch&&isc)cls+=' correct';else if(oi===ch)cls+=' wrong';else if(oi===q.correct)cls+=' reveal';}
       return `<button class="${cls}" data-prefix="${prefix}" data-qi="${qi}" data-oi="${oi}" ${rv?'disabled':''}><span class="opt-l">${ltrs[oi]}</span><span>${o}</span></button>`;
     }).join('');
-    const fb=rv?`<div class="feedback">${isc?'✓ Richtig!':'✗ Falsch.'} ${q.tip}</div>`:'';
-    return `<div class="quiz-q"><div class="quiz-qn">Frage ${qi+1}</div><div class="quiz-qt">${q.q}</div><div class="opts">${opts}</div>${fb}</div>`;
+    // Feedback with auto-linked glossary terms + glossar hint
+    const tipLinked=rv?linkGlossaryTerms(q.tip):'';
+    const glossLink=rv?` <span style="font-size:11px;opacity:.7">→ <span class="gterm" style="font-size:11px" onclick="setTab('glo')">Alle Begriffe im Glossar</span></span>`:'';
+    const fb=rv?`<div class="feedback">${isc?'✓ Richtig!':'✗ Falsch.'} ${tipLinked}${glossLink}</div>`:'';
+    return `<div class="quiz-q"><div class="quiz-qn">Frage ${qi+1}</div><div class="quiz-qt">${linkGlossaryTerms(q.q)}</div><div class="opts">${opts}</div>${fb}</div>`;
   }).join('');
   document.querySelectorAll(`[data-prefix="${prefix}"]`).forEach(el=>{
     el.addEventListener('click',()=>{
@@ -850,6 +1084,7 @@ function drawArrow(FX,FY,FW,FH,a){
 
 /* init */
 showPosScreen('phase');showSchScreen('phase');
+document.getElementById('tab-glo').style.display='none';
 </script>
 </body>
 </html>
